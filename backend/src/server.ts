@@ -9,7 +9,7 @@ app.use(express.json());
 dotenv.config();
 connectDB();
 
-app.use("/", routes);
+app.use("/api", routes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

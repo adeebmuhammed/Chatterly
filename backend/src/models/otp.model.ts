@@ -2,7 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IOtp extends Document {
   otp: string | null;
-  userId: mongoose.Schema.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   expiresAt: Date;
 }
 
@@ -10,7 +10,7 @@ const OtpSchema: Schema = new Schema(
   {
     otp: { type: String, required: true },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Types.ObjectId,
       ref: "User",
       required: true,
     },
