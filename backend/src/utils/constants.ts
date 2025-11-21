@@ -36,6 +36,7 @@ export const MESSAGES = {
     INVALID_EMAIL: "Invalid Email Format",
     INVALID_PASSWORD: "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
     INVALID_PHONE: "Invalid Phone No Format",
+    CREATION_FAILED: "document creation failed",
   },
 };
 

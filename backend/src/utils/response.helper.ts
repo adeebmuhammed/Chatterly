@@ -1,19 +1,23 @@
 import { ApiResponse } from "../dto/common-response.dto";
 
-export class CommonResponseHelper {
-  sendSuccess = <T>(message: string, data?: T): ApiResponse<T> => {
+export const sendSuccess = <T>(
+    message: string,
+    data?: T
+): ApiResponse<T> => {
     return {
-      success: true,
-      message,
-      data,
+        success: true,
+        message,
+        data,
     };
-  };
+};
 
-  sendError = (message: string, error?: Error): ApiResponse<null> => {
+export const sendError = (
+    message: string,
+    error?: any
+): ApiResponse<null> => {
     return {
-      success: false,
-      message,
-      error,
+        success: false,
+        message,
+        error,
     };
-  };
-}
+};
