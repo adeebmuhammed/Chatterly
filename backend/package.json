@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.5",
     "@types/mongoose": "^5.11.96",
@@ -21,8 +22,11 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "mongoose": "^8.20.0"
+    "inversify": "^7.10.4",
+    "mongoose": "^8.20.0",
+    "reflect-metadata": "^0.2.2"
   }
 }
