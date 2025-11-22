@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Router } from '@angular/router';
@@ -16,7 +16,7 @@ import { UserHeaderComponent } from '../../../components/user/user-header/user-h
   templateUrl: './user-signup.component.html',
   styleUrl: './user-signup.component.css',
 })
-export class UserSignupComponent {
+export class UserSignupComponent implements OnDestroy{
   signupForm: FormGroup;
   errorMessage = '';
 

@@ -78,22 +78,22 @@ export class AuthService {
   //   return this.http.post<{ message: string; user: { name: string } }>(`${environment.apiBaseUrl}/resend-otp`, data);
   // }
 
-  //   userSignin(data: { email: string; password: string }): Observable<{ message: string; user: IUserLoginResponse }> {
-  //   return new Observable(observer => {
-  //     this.http.post<{ message: string; user: IUserLoginResponse }>(`${environment.apiBaseUrl}/login`, data).subscribe({
-  //       next: (res: any) => {
-  //         localStorage.setItem('role',"user");
-  //         localStorage.setItem('token',res?.user?.token)
-  //         const name = res.user?.name || '';
-  //         const userId = res.user?.id || '';
+    userSignin(data: { email: string; password: string }): Observable<ApiResponse<null>> {
+    return new Observable(observer => {
+      this.http.post<ApiResponse<null>>(`${environment.apiBaseUrl}/login`, data).subscribe({
+        next: (res: any) => {
+          localStorage.setItem('role',"user");
+          localStorage.setItem('token',res?.user?.token)
+          const name = res.user?.name || '';
+          const userId = res.user?.id || '';
 
-  //         this.updateLoginState("user", true, name, userId);
+          this.updateLoginState("user", true, name, userId);
 
-  //         observer.next(res); // pass to component
-  //         observer.complete();
-  //       },
-  //       error: err => observer.error(err)
-  //     });
-  //   });
-  // }
+          observer.next(res); // pass to component
+          observer.complete();
+        },
+        error: err => observer.error(err)
+      });
+    });
+  }
 }
