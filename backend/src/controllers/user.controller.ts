@@ -18,7 +18,11 @@ export class UserController implements IUserController {
 
       res.status(STATUS_CODES.OK).json(sendSuccess(loginResponse.message));
     } catch (error) {
-      res.status(500).json(sendError( error instanceof Error ? error.message : "Login failed"));
+      res
+        .status(500)
+        .json(
+          sendError(error instanceof Error ? error.message : "Login failed")
+        );
     }
   };
 
@@ -30,7 +34,62 @@ export class UserController implements IUserController {
 
       res.status(STATUS_CODES.OK).json(sendSuccess(signupResponse.message));
     } catch (error) {
-      res.status(500).json(sendError( error instanceof Error ? error.message : "Signup failed"));
+      res
+        .status(500)
+        .json(
+          sendError(error instanceof Error ? error.message : "Signup failed")
+        );
+    }
+  };
+
+  verifyOTP = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email, otp } = req.body;
+      const { response } = await this._userService.verifyOTP(email, otp);
+      let status;
+
+      if (response) {
+        status = STATUS_CODES.OK;
+      } else {
+        status = STATUS_CODES.CONFLICT;
+      }
+
+      res.status(status).json(response);
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      res.status(STATUS_CODES.BAD_REQUEST).json({
+        error:
+          error instanceof Error ? error.message : "OTP verification failed",
+      });
+    }
+  };
+
+  resendOTP = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { email } = req.body;
+
+      if (!email) {
+        res.status(STATUS_CODES.BAD_REQUEST).json({
+          error: "Email is required",
+        });
+        return;
+      }
+
+      const { response } = await this._userService.resendOTP(email);
+      let status;
+
+      if (response) {
+        status = STATUS_CODES.OK;
+      } else {
+        status = STATUS_CODES.CONFLICT;
+      }
+
+      res.status(status).json(response);
+    } catch (error) {
+      console.error("OTP resend error:", error);
+      res.status(STATUS_CODES.BAD_REQUEST).json({
+        error: error instanceof Error ? error.message : "Failed to resend OTP",
+      });
     }
   };
 }

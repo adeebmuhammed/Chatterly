@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   phone: string;
+  isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,6 +25,7 @@ const UserSchema: Schema = new Schema(
       required: true,
     },
     phone: { type: String, trim: true, default: null },
+    isVerified: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

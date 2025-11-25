@@ -2,13 +2,15 @@ import { Routes } from "@angular/router";
 import { USER_ROUTES_PATHS } from "../constants/user-route.constant";
 import { UserLoginComponent } from "../pages/user/user-login/user-login.component";
 import { UserSignupComponent } from "../pages/user/user-signup/user-signup.component";
+import { UserVerifyOtpComponent } from "../pages/user/user-verify-otp/user-verify-otp.component";
+import { UserHomeComponent } from "../pages/user/user-home/user-home.component";
 
 export const USER_ROUTES: Routes = [
-//   {
-//     path: USER_ROUTES_PATHS.HOME,
-//     component: UserHomeComponent,
-//     canActivate: [userAuthGuard],
-//   },
+  {
+    path: USER_ROUTES_PATHS.HOME,
+    component: UserHomeComponent,
+    // canActivate: [userAuthGuard],
+  },
   {
     path: USER_ROUTES_PATHS.LOGIN,
     component: UserLoginComponent,
@@ -19,5 +21,5 @@ export const USER_ROUTES: Routes = [
     component: UserSignupComponent,
     // canActivate: [userAlreadyLoggedInGuard],
   },
-//   { path: USER_ROUTES_PATHS.VERIFY_OTP, component: UserOtpComponent },
+  { path: USER_ROUTES_PATHS.VERIFY_OTP, component: UserVerifyOtpComponent },
 ];

@@ -9,4 +9,13 @@ export interface IUserService {
   signup(
     userData: UserRegisterRequestDto
   ): Promise<{ signupResponse: MessageResponseDto }>;
+  verifyOTP(
+    email: string,
+    otp: string
+  ): Promise<{
+    response: MessageResponseDto & { user: { name: string; id: string } };
+  }>;
+  resendOTP(
+    email: string
+  ): Promise<{ response: MessageResponseDto & { user: { name: string } } }>;
 }

@@ -7,11 +7,10 @@ const userController = container.get<IUserController>(TYPES.IUserController)
 
 const routes = Router();
 
-routes.get("/", (req:Request, res: Response)=>{
-    res.send("on")
-})
 routes
 .post("/signup", userController.signup)
 .post("/login", userController.login)
+.post('/verify-otp',userController.verifyOTP)
+.post('/resend-otp',userController.resendOTP)
 
 export default routes;

@@ -62,21 +62,21 @@ export class AuthService {
     );
   }
 
-  //   userVerifyOtp(data: { email: string; otp: string; }): Observable<{ message: string; user: { name: string; email: string } }> {
-  //   return new Observable(observer => {
-  //     this.http.post<{ message: string; user: { name: string; email: string } }>(`${environment.apiBaseUrl}/verify-otp`, data).subscribe({
-  //       next: (res) => {
-  //         observer.next(res);
-  //         observer.complete();
-  //       },
-  //       error: err => observer.error(err)
-  //     });
-  //   });
-  // }
+    userVerifyOtp(data: { email: string; otp: string; }): Observable<{ message: string; user: { name: string; email: string } }> {
+    return new Observable(observer => {
+      this.http.post<{ message: string; user: { name: string; email: string } }>(`${environment.apiBaseUrl}/verify-otp`, data).subscribe({
+        next: (res) => {
+          observer.next(res);
+          observer.complete();
+        },
+        error: err => observer.error(err)
+      });
+    });
+  }
 
-  //   userResendOtp(data: { email: string; }): Observable<{ message: string; user: { name: string } }> {
-  //   return this.http.post<{ message: string; user: { name: string } }>(`${environment.apiBaseUrl}/resend-otp`, data);
-  // }
+    userResendOtp(data: { email: string; }): Observable<{ message: string; user: { name: string } }> {
+    return this.http.post<{ message: string; user: { name: string } }>(`${environment.apiBaseUrl}/resend-otp`, data);
+  }
 
     userSignin(data: { email: string; password: string }): Observable<ApiResponse<null>> {
     return new Observable(observer => {
