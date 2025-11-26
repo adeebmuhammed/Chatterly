@@ -28,7 +28,7 @@
 }
 
 /* Nav Links */
-.nav a {
+.nav a{
   margin-left: 24px;
   text-decoration: none;
   color: #374151;
@@ -37,7 +37,18 @@
   transition: color 0.2s ease;
 }
 
-.nav a:hover {
+.nav button {
+  margin-left: 24px;
+  text-decoration: none;
+  color: #374151;
+  font-family: Inter, sans-serif;
+  font-size: 15px;
+  transition: color 0.2s ease;
+  border: none;
+  background: none;
+}
+
+.nav a:hover, .nav button:hover {
   color: #4f46e5;
 }
 
@@ -49,7 +60,7 @@
   .logo {
     font-size: 20px;
   }
-  .nav a {
+  .nav a, .nav button {
     margin-left: 16px;
     font-size: 14px;
   }

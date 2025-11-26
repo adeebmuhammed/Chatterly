@@ -13,9 +13,9 @@ export interface IUserService {
     email: string,
     otp: string
   ): Promise<{
-    response: MessageResponseDto & { user: { name: string; id: string } };
+    verifyOTPResponse: MessageResponseDto & { user: { name: string; id: string } };
   }>;
   resendOTP(
     email: string
-  ): Promise<{ response: MessageResponseDto & { user: { name: string } } }>;
+  ): Promise<{ resendOTPResponse: MessageResponseDto & { user: { name: string } } }>;
 }

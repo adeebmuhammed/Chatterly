@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiResponse } from '../../interfaces/common-interface';
 import { environment } from '../../../environment/environment';
+import { resendOtpInterface } from '../../interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -74,8 +75,8 @@ export class AuthService {
     });
   }
 
-    userResendOtp(data: { email: string; }): Observable<{ message: string; user: { name: string } }> {
-    return this.http.post<{ message: string; user: { name: string } }>(`${environment.apiBaseUrl}/resend-otp`, data);
+    userResendOtp(data: { email: string; }): Observable< ApiResponse<resendOtpInterface>> {
+    return this.http.post< ApiResponse<resendOtpInterface> >(`${environment.apiBaseUrl}/resend-otp`, data);
   }
 
     userSignin(data: { email: string; password: string }): Observable<ApiResponse<null>> {
@@ -90,6 +91,20 @@ export class AuthService {
           this.updateLoginState("user", true, name, userId);
 
           observer.next(res); // pass to component
+          observer.complete();
+        },
+        error: err => observer.error(err)
+      });
+    });
+  }
+
+  userLogout(): Observable<ApiResponse<null>> {
+    return new Observable(observer => {
+      this.http.post<ApiResponse<null>>(`${environment.apiBaseUrl}/logout`, {}).subscribe({
+        next: res => {
+          localStorage.clear();
+          this.updateLoginState("user", false, null, null);
+          observer.next(res);
           observer.complete();
         },
         error: err => observer.error(err)

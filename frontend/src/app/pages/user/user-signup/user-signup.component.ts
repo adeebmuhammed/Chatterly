@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../services/auth/auth.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { USER_ROUTES_PATHS } from '../../../constants/user-route.constant';
 import Swal from 'sweetalert2';
@@ -11,7 +11,8 @@ import { UserHeaderComponent } from '../../../components/user/user-header/user-h
   selector: 'app-user-signup',
   imports: [
     UserHeaderComponent,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './user-signup.component.html',
   styleUrl: './user-signup.component.css',

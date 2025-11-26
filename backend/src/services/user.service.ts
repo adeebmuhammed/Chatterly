@@ -124,7 +124,7 @@ export class UserService implements IUserService {
     email: string,
     otp: string
   ): Promise<{
-    response: MessageResponseDto & { user: { name: string; id: string } };
+    verifyOTPResponse: MessageResponseDto & { user: { name: string; id: string } };
   }> => {
     if (!isValidOTP(otp)) {
       throw new Error("OTP must be a 6-digit number");
@@ -147,7 +147,7 @@ export class UserService implements IUserService {
     await this._userRepo.update(user._id.toString(), user);
 
     return {
-      response: {
+      verifyOTPResponse: {
         message: MESSAGES.SUCCESS.OTP_VERIFIED,
         user: {
           name: user.name,
@@ -160,7 +160,7 @@ export class UserService implements IUserService {
   resendOTP = async (
     email: string
   ): Promise<{
-    response: MessageResponseDto & { user: { name: string; email: string } };
+    resendOTPResponse: MessageResponseDto & { user: { name: string; email: string } };
   }> => {
     const user = await this._userRepo.findByEmail(email);
     if (!user) {
@@ -193,7 +193,7 @@ export class UserService implements IUserService {
     }
 
     return {
-      response: {
+      resendOTPResponse: {
         message: MESSAGES.SUCCESS.OTP_RESENT,
         user: {
           name: user.name,

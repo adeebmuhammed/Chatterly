@@ -45,16 +45,19 @@ export class UserController implements IUserController {
   verifyOTP = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, otp } = req.body;
-      const { response } = await this._userService.verifyOTP(email, otp);
+      const { verifyOTPResponse } = await this._userService.verifyOTP(
+        email,
+        otp
+      );
       let status;
 
-      if (response) {
+      if (verifyOTPResponse) {
         status = STATUS_CODES.OK;
       } else {
         status = STATUS_CODES.CONFLICT;
       }
 
-      res.status(status).json(response);
+      res.status(status).json(verifyOTPResponse);
     } catch (error) {
       console.error("OTP verification error:", error);
       res.status(STATUS_CODES.BAD_REQUEST).json({
@@ -75,21 +78,30 @@ export class UserController implements IUserController {
         return;
       }
 
-      const { response } = await this._userService.resendOTP(email);
+      const { resendOTPResponse } = await this._userService.resendOTP(email);
       let status;
 
-      if (response) {
+      if (resendOTPResponse) {
         status = STATUS_CODES.OK;
       } else {
         status = STATUS_CODES.CONFLICT;
       }
 
-      res.status(status).json(response);
+      res
+        .status(status)
+        .json(sendSuccess(resendOTPResponse.message, resendOTPResponse.user));
     } catch (error) {
       console.error("OTP resend error:", error);
       res.status(STATUS_CODES.BAD_REQUEST).json({
         error: error instanceof Error ? error.message : "Failed to resend OTP",
       });
     }
+  };
+
+  logout = async (req: Request, res: Response): Promise<void> => {
+    res.clearCookie("auth-token", { path: "/" });
+    res.clearCookie("refresh-token", { path: "/" });
+
+    res.status(STATUS_CODES.OK).json(sendSuccess("logged out successfully"));
   };
 }

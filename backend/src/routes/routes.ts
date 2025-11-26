@@ -12,5 +12,6 @@ routes
 .post("/login", userController.login)
 .post('/verify-otp',userController.verifyOTP)
 .post('/resend-otp',userController.resendOTP)
+.post('/logout',userController.logout)
 
 export default routes;
