@@ -1,0 +1,67 @@
+/* Full page background */
+.home-wrapper {
+  min-height: 100vh;
+  padding: 80px 20px;
+  background: #f5f7fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+/* Card container */
+.home-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 500px;
+  padding: 30px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  text-align: center;
+  font-family: Inter, sans-serif;
+}
+
+/* Title */
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+/* Subtext */
+.subtext {
+  font-size: 16px;
+  color: #4b5563;
+  margin-bottom: 28px;
+  line-height: 24px;
+}
+
+/* Purple button */
+.notify-btn {
+  background: #6366f1;
+  color: #ffffff;
+  width: 100%;
+  padding: 14px 0;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.notify-btn:hover {
+  background: #4f46e5;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .home-card {
+    padding: 22px;
+  }
+  .title {
+    font-size: 24px;
+  }
+}

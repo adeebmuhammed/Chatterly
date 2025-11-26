@@ -8,6 +8,7 @@ import { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { MESSAGES } from "../utils/constants";
 import {
   isValidEmail,
+  isValidOTP,
   isValidPassword,
   isValidPhone,
 } from "../utils/validators";
@@ -116,6 +117,89 @@ export class UserService implements IUserService {
 
     return {
       signupResponse: BaseMapper.toMessageResponse(MESSAGES.SUCCESS.SIGNUP),
+    };
+  };
+
+  verifyOTP = async (
+    email: string,
+    otp: string
+  ): Promise<{
+    verifyOTPResponse: MessageResponseDto & { user: { name: string; id: string } };
+  }> => {
+    if (!isValidOTP(otp)) {
+      throw new Error("OTP must be a 6-digit number");
+    }
+
+    const user = await this._userRepo.findByEmail(email);
+    if (!user) {
+      throw new Error(MESSAGES.ERROR.USER_NOT_FOUND);
+    }
+
+    const otpGenerated = await this._otpRepo.findOne({ userId: user._id });
+    if (!otpGenerated) {
+      throw new Error("otp expired");
+    }
+
+    if (otpGenerated.otp !== otp) {
+      throw new Error(MESSAGES.ERROR.OTP_INVALID);
+    }
+
+    await this._userRepo.update(user._id.toString(), user);
+
+    return {
+      verifyOTPResponse: {
+        message: MESSAGES.SUCCESS.OTP_VERIFIED,
+        user: {
+          name: user.name,
+          id: user.id,
+        },
+      },
+    };
+  };
+
+  resendOTP = async (
+    email: string
+  ): Promise<{
+    resendOTPResponse: MessageResponseDto & { user: { name: string; email: string } };
+  }> => {
+    const user = await this._userRepo.findByEmail(email);
+    if (!user) {
+      throw new Error(MESSAGES.ERROR.USER_NOT_FOUND);
+    }
+
+    const newOTP = otpHelper.generateOTP();
+    await otpHelper.sendOTP(email, newOTP);
+    console.log("Generated OTP:", newOTP);
+
+    const alreadyExistingOtp = await this._otpRepo.findOne({
+      userId: user._id,
+    });
+    let otpCreated;
+    if (!alreadyExistingOtp) {
+      otpCreated = await this._otpRepo.create({
+        otp: newOTP,
+        expiresAt: new Date(Date.now() + 10 * 60 * 1000),
+        userId: user._id,
+      });
+    } else {
+      otpCreated = await this._otpRepo.update(
+        (alreadyExistingOtp._id as mongoose.Types.ObjectId).toString(),
+        { otp: newOTP, expiresAt: new Date(Date.now() + 10 * 60 * 1000) }
+      );
+    }
+
+    if (!otpCreated) {
+      throw new Error("otp generation failed");
+    }
+
+    return {
+      resendOTPResponse: {
+        message: MESSAGES.SUCCESS.OTP_RESENT,
+        user: {
+          name: user.name,
+          email: user.email,
+        },
+      },
     };
   };
 }

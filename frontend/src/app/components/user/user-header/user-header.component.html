@@ -1,0 +1,14 @@
+<header class="header">
+  <div class="header-container">
+    <div class="logo">Chatterly</div>
+
+    <nav class="nav">
+      @if (isLoggedIn) {
+      <button (click)="logout()">Logout</button>
+      }@else {
+      <a routerLink="/login">Login</a>
+      <a routerLink="/signup">Sign Up</a>
+      }
+    </nav>
+  </div>
+</header>
