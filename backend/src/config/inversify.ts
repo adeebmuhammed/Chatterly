@@ -8,6 +8,10 @@ import { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { UserRepository } from "../repositories/user.repository";
 import { IOtpRepository } from "../repositories/interfaces/IOtpRepository";
 import { OtpRepository } from "../repositories/otp.repository";
+import { IChatRepository } from "../repositories/interfaces/IChatRepository";
+import { ChatRepository } from "../repositories/chat.repository";
+import { IMessageRepository } from "../repositories/interfaces/IMessageRepository";
+import { MessageRepository } from "../repositories/message.repository";
 
 const container = new Container();
 
@@ -16,5 +20,9 @@ container.bind<IUserService>(TYPES.IUserService).to(UserService);
 container.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
 
 container.bind<IOtpRepository>(TYPES.IOtpRepository).to(OtpRepository);
+
+container.bind<IChatRepository>(TYPES.IChatRepository).to(ChatRepository);
+
+container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
 
 export { container };

@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { USER_ACTIVE_STATUS } from "../utils/constants";
 
 export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
@@ -7,6 +8,8 @@ export interface IUser extends Document {
   password: string;
   phone: string;
   isVerified: boolean;
+  status: USER_ACTIVE_STATUS;
+  lastSeen: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,7 +28,9 @@ const UserSchema: Schema = new Schema(
       required: true,
     },
     phone: { type: String, trim: true, default: null },
-    isVerified: { type: Boolean, default: false }
+    isVerified: { type: Boolean, default: false },
+    status: { type: String, enum: USER_ACTIVE_STATUS, default: USER_ACTIVE_STATUS.OFFLINE },
+    lastSeen: { type: Date, default: null }
   },
   { timestamps: true }
 );
