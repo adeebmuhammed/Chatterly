@@ -8,8 +8,8 @@ export class MessageRepository extends BaseRepository<IMessage> {
     super(Messages);
   }
 
-  async getMessagesByConversation(conversationId: string): Promise<IMessage[]> {
-    return Messages.find({ conversationId })
+  async getMessagesByChat(chatId: string): Promise<IMessage[]> {
+    return Messages.find({ chatId })
       .populate("sender", "name email")
       .sort({ createdAt: 1 })
       .exec();
