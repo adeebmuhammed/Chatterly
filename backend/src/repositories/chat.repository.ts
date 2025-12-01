@@ -1,7 +1,6 @@
 import { injectable } from "inversify";
 import { BaseRepository } from "./base.repository";
 import Chats, { IChat } from "../models/chat.model";
-import { exec } from "child_process";
 
 @injectable()
 export class ChatRepository extends BaseRepository<IChat> {

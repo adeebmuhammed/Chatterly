@@ -1,14 +1,22 @@
 <app-user-header></app-user-header>
 
-<div class="home-wrapper">
-  <div class="home-card">
-    <h1 class="title">🚧 Under Development</h1>
+<div class="chat-container">
 
-    <p class="subtext">
-      We're working hard to bring you something amazing.  
-      Some features are still being built.
-    </p>
-
-    <button class="notify-btn">Notify Me When Ready</button>
+  <!-- Left: Chat List -->
+  <div class="left-panel">
+    <app-chat-list 
+      [chats]="chats" 
+      (selectChatEmitter)="onChatSelected($event)">
+    </app-chat-list>
   </div>
+
+  <!-- Right: Chat Window -->
+  <div class="right-panel">
+    <app-chat-window 
+      [messages]="messages"
+      [activeChat]="activeChat"
+      (sendMessageEmitter)="onSendMessage($event)">
+    </app-chat-window>
+  </div>
+
 </div>

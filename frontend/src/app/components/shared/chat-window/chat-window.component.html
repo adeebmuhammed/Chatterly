@@ -1,0 +1,35 @@
+<div class="chat-window">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <img class="avatar" src="user.png" />
+    <div class="user-info">
+      <h3>{{ activeChat?.name }}</h3>
+      <p>online</p>
+    </div>
+  </div>
+
+  <!-- Messages Section -->
+  <div class="messages" id="messageArea">
+    <div 
+      class="message" 
+      [ngClass]="{ 'sent': msg.isMine, 'received': !msg.isMine }"
+      *ngFor="let msg of messages"
+    >
+      {{ msg.text }}
+      <span class="time">{{ msg.time }}</span>
+    </div>
+  </div>
+
+  <div class="chat-input">
+  <input 
+    type="text" 
+    [(ngModel)]="messageText" 
+    placeholder="Type a message" 
+    (keyup.enter)="send()"
+  />
+
+  <button (click)="send()">Send</button>
+</div>
+
+</div>

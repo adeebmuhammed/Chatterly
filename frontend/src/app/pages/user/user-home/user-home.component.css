@@ -1,67 +1,50 @@
-/* Full page background */
-.home-wrapper {
-  min-height: 100vh;
-  padding: 80px 20px;
-  background: #f5f7fa;
+.chat-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
+  height: calc(100vh - 80px); /* Adjust depending on header height */
+  background: #f0f2f5;
+  overflow: hidden;
 }
 
-/* Card container */
-.home-card {
+/* LEFT PANEL: Chat List */
+.left-panel {
+  width: 30%;
+  max-width: 420px;       /* WhatsApp-like limit */
+  min-width: 280px;
   background: #ffffff;
-  width: 100%;
-  max-width: 500px;
-  padding: 30px;
-  border-radius: 16px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.left-panel app-chat-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* RIGHT PANEL: Chat Window */
+.right-panel {
+  flex: 1;
+  background: #efeae2;   /* WhatsApp chat background color */
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.right-panel app-chat-window {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Placeholder when no chat selected */
+.no-chat-selected {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
-  font-family: Inter, sans-serif;
-}
-
-/* Title */
-.title {
-  font-size: 28px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 16px;
-}
-
-/* Subtext */
-.subtext {
-  font-size: 16px;
-  color: #4b5563;
-  margin-bottom: 28px;
-  line-height: 24px;
-}
-
-/* Purple button */
-.notify-btn {
-  background: #6366f1;
-  color: #ffffff;
-  width: 100%;
-  padding: 14px 0;
-  border: none;
-  border-radius: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.notify-btn:hover {
-  background: #4f46e5;
-}
-
-/* Responsive */
-@media (max-width: 640px) {
-  .home-card {
-    padding: 22px;
-  }
-  .title {
-    font-size: 24px;
-  }
+  color: #888;
+  font-size: 18px;
+  font-weight: 500;
 }
