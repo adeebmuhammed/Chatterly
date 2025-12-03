@@ -5,10 +5,16 @@ import { ChatWindowComponent } from '../../../components/shared/chat-window/chat
 import { ChatService } from '../../../services/chat/chat.service';
 import { SocketService } from '../../../services/socket/socket.service';
 import { AuthService } from '../../../services/auth/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-user-home',
-  imports: [UserHeaderComponent, ChatListComponent, ChatWindowComponent],
+  imports: [
+    UserHeaderComponent,
+    ChatListComponent,
+    ChatWindowComponent,
+    CommonModule,
+  ],
   templateUrl: './user-home.component.html',
   styleUrl: './user-home.component.css',
 })
@@ -34,8 +40,8 @@ export class UserHomeComponent {
   }
 
   loadChats() {
-    console.log("initialized");
-    
+    console.log('initialized');
+
     this.authService.userId$.subscribe((id) => {
       if (!id) {
         return;

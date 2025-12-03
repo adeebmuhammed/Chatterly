@@ -9,10 +9,10 @@
     </div>
   </div>
 
-  <!-- Messages Section -->
+  <!-- Messages -->
   <div class="messages" id="messageArea">
     <div 
-      class="message" 
+      class="message"
       [ngClass]="{ 'sent': msg.isMine, 'received': !msg.isMine }"
       *ngFor="let msg of messages"
     >
@@ -21,15 +21,16 @@
     </div>
   </div>
 
+  <!-- Input -->
   <div class="chat-input">
-  <input 
-    type="text" 
-    [(ngModel)]="messageText" 
-    placeholder="Type a message" 
-    (keyup.enter)="send()"
-  />
+    <input 
+      type="text" 
+      [(ngModel)]="messageText" 
+      placeholder="Type a message..." 
+      (keyup.enter)="send()"
+    />
 
-  <button (click)="send()">Send</button>
-</div>
+    <button (click)="send()">Send</button>
+  </div>
 
 </div>

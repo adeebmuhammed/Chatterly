@@ -16,6 +16,7 @@ import { IOtpRepository } from "../repositories/interfaces/IOtpRepository";
 import otpHelper from "../utils/otp.helper";
 import mongoose from "mongoose";
 import { BaseMapper } from "../mappers/base.mapper";
+import { IUser } from "../models/user.model";
 
 @injectable()
 export class UserService implements IUserService {
@@ -124,7 +125,9 @@ export class UserService implements IUserService {
     email: string,
     otp: string
   ): Promise<{
-    verifyOTPResponse: MessageResponseDto & { user: { name: string; id: string } };
+    verifyOTPResponse: MessageResponseDto & {
+      user: { name: string; id: string };
+    };
   }> => {
     if (!isValidOTP(otp)) {
       throw new Error("OTP must be a 6-digit number");
@@ -160,7 +163,9 @@ export class UserService implements IUserService {
   resendOTP = async (
     email: string
   ): Promise<{
-    resendOTPResponse: MessageResponseDto & { user: { name: string; email: string } };
+    resendOTPResponse: MessageResponseDto & {
+      user: { name: string; email: string };
+    };
   }> => {
     const user = await this._userRepo.findByEmail(email);
     if (!user) {
@@ -201,5 +206,19 @@ export class UserService implements IUserService {
         },
       },
     };
+  };
+
+  searchUsers = async (query: string): Promise<{ users: IUser[] }> => {
+    const users = await this._userRepo.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    });
+    if (!users) {
+      throw new Error("No users found");
+    }
+
+    return { users };
   };
 }

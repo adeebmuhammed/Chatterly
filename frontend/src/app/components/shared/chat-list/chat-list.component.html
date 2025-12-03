@@ -1,5 +1,9 @@
 <div class="chat-list-wrapper">
-  <div class="chat-item" *ngFor="let chat of chats" (click)="selectChat(chat)">
+  <div 
+    class="chat-item"
+    *ngFor="let chat of chats"
+    (click)="selectChat(chat)"
+  >
     <img class="avatar" src="user.png" />
 
     <div class="chat-info">
@@ -7,6 +11,12 @@
       <div class="last-msg">{{ chat.lastMessage }}</div>
     </div>
 
-    <div class="time">{{ chat.time }}</div>
+    <div class="chat-meta">
+      <div class="time">{{ chat.time }}</div>
+
+      <div *ngIf="chat.unread > 0" class="unread-badge">
+        {{ chat.unread }}
+      </div>
+    </div>
   </div>
 </div>

@@ -12,11 +12,19 @@
 
   <!-- Right: Chat Window -->
   <div class="right-panel">
-    <app-chat-window 
-      [messages]="messages"
-      [activeChat]="activeChat"
-      (sendMessageEmitter)="onSendMessage($event)">
-    </app-chat-window>
+    <ng-container *ngIf="activeChat; else noChat">
+      <app-chat-window 
+        [messages]="messages"
+        [activeChat]="activeChat"
+        (sendMessageEmitter)="onSendMessage($event)">
+      </app-chat-window>
+    </ng-container>
+
+    <ng-template #noChat>
+      <div class="no-chat-selected">
+        Select a chat to start messaging
+      </div>
+    </ng-template>
   </div>
 
 </div>

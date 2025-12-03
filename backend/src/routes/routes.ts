@@ -7,7 +7,9 @@ import { IMessageController } from "../controllers/interfaces/IMessageController
 
 const userController = container.get<IUserController>(TYPES.IUserController);
 const chatController = container.get<IChatController>(TYPES.IChatController);
-const messageController = container.get<IMessageController>(TYPES.IMessageController);
+const messageController = container.get<IMessageController>(
+  TYPES.IMessageController
+);
 
 const routes = Router();
 
@@ -17,6 +19,8 @@ routes
   .post("/verify-otp", userController.verifyOTP)
   .post("/resend-otp", userController.resendOTP)
   .post("/logout", userController.logout);
+
+routes.get("/search-users", userController.searchUsers);
 
 routes
   .get("/chat/:userId", chatController.findOrCreateChat)

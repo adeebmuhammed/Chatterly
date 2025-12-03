@@ -1,50 +1,32 @@
 .chat-container {
   display: flex;
-  height: calc(100vh - 80px); /* Adjust depending on header height */
+  height: calc(100vh - 80px);
   background: #f0f2f5;
   overflow: hidden;
 }
 
-/* LEFT PANEL: Chat List */
+/* LEFT PANEL */
 .left-panel {
   width: 30%;
-  max-width: 420px;       /* WhatsApp-like limit */
+  max-width: 420px;
   min-width: 280px;
   background: #ffffff;
   border-right: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.left-panel app-chat-list {
-  flex: 1;
   overflow-y: auto;
 }
 
-/* RIGHT PANEL: Chat Window */
+/* RIGHT PANEL */
 .right-panel {
   flex: 1;
-  background: #efeae2;   /* WhatsApp chat background color */
-  display: flex;
-  flex-direction: column;
+  background: #efeae2;
   position: relative;
-  overflow: hidden;
+  display: flex;
 }
 
-.right-panel app-chat-window {
-  flex: 1;
-  overflow-y: auto;
-}
-
-/* Placeholder when no chat selected */
+/* No Chat Selected Placeholder */
 .no-chat-selected {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  margin: auto;
   text-align: center;
+  font-size: 20px;
   color: #888;
-  font-size: 18px;
-  font-weight: 500;
 }

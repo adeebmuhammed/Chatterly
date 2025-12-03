@@ -104,4 +104,22 @@ export class UserController implements IUserController {
 
     res.status(STATUS_CODES.OK).json(sendSuccess("logged out successfully"));
   };
+
+  searchUsers = async (req: Request, res: Response) => {
+    try {
+      const query = req.query.q as string;
+
+      const { users } = await this._userService.searchUsers(query);
+
+      if (users.length < 1) {
+        res
+          .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+          .json(sendError("Users Not Found"));
+      } else {
+        res.status(200).json(sendSuccess("Users fetched successfully", users));
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Error searching users", error });
+    }
+  };
 }
