@@ -5,3 +5,9 @@ export class UserRegisterRequestDto {
   password!: string;
   confirmPassword!: string;
 }
+
+export class UserSearchResultDto {
+  id!: string;
+  name!: string;
+  email!: string;
+}

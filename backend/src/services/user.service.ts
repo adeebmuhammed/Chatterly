@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { inject, injectable } from "inversify";
 import { MessageResponseDto } from "../dto/base.dto";
-import { UserRegisterRequestDto } from "../dto/user.dto";
+import { UserRegisterRequestDto, UserSearchResultDto } from "../dto/user.dto";
 import { IUserService } from "./interfaces/IUserService";
 import { TYPES } from "../config/types";
 import { IUserRepository } from "../repositories/interfaces/IUserRepository";
@@ -17,6 +17,7 @@ import otpHelper from "../utils/otp.helper";
 import mongoose from "mongoose";
 import { BaseMapper } from "../mappers/base.mapper";
 import { IUser } from "../models/user.model";
+import { UserMapper } from "../mappers/user.mapper";
 
 @injectable()
 export class UserService implements IUserService {
@@ -208,7 +209,9 @@ export class UserService implements IUserService {
     };
   };
 
-  searchUsers = async (query: string): Promise<{ users: IUser[] }> => {
+  searchUsers = async (
+    query: string
+  ): Promise<{ users: UserSearchResultDto[] }> => {
     const users = await this._userRepo.find({
       $or: [
         { name: { $regex: query, $options: "i" } },
@@ -219,6 +222,6 @@ export class UserService implements IUserService {
       throw new Error("No users found");
     }
 
-    return { users };
+    return { users: UserMapper.toUserSearchResultDtoList(users) };
   };
 }

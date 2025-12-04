@@ -1,5 +1,13 @@
 <app-user-header></app-user-header>
 
+<!-- Search Bar Wrapper -->
+<div class="top-search-bar">
+  <app-search
+    [searchResults]="results"
+    (search)="onSearch($event)">
+  </app-search>
+</div>
+
 <div class="chat-container">
 
   <!-- Left: Chat List -->
@@ -26,5 +34,4 @@
       </div>
     </ng-template>
   </div>
-
 </div>

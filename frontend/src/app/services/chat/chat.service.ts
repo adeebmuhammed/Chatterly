@@ -1,6 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environment/environment';
+import { Observable } from 'rxjs';
+import { ApiResponse } from '../../interfaces/common-interface';
+import { UserSearchResultResponse } from '../../interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -8,6 +11,15 @@ import { environment } from '../../../environment/environment';
 export class ChatService {
   private http = inject(HttpClient);
   private baseUrl = `${environment.apiBaseUrl}`;
+
+  searchUsers(
+    query: string
+  ): Observable<ApiResponse<UserSearchResultResponse[]>> {
+    return this.http.get<ApiResponse<UserSearchResultResponse[]>>(
+      `${this.baseUrl}/search-users`,
+      { params: { q: query } }
+    );
+  }
 
   // Get all chats for logged-in user
   getChats(userId: string) {

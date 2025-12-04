@@ -1,6 +1,18 @@
+/* Search bar area */
+.top-search-bar {
+  width: 100%;
+  background: #fff;
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #ddd;
+  margin-top: 50px;
+}
+
+/* Chat Layout */
 .chat-container {
   display: flex;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 140px); /* reduced height so search bar fits */
   background: #f0f2f5;
   overflow: hidden;
 }

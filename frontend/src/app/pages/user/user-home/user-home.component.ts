@@ -6,6 +6,9 @@ import { ChatService } from '../../../services/chat/chat.service';
 import { SocketService } from '../../../services/socket/socket.service';
 import { AuthService } from '../../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
+import { SearchComponent } from '../../../components/shared/search/search.component';
+import { UserSearchResultResponse } from '../../../interfaces/user.interface';
+import { ApiResponse } from '../../../interfaces/common-interface';
 
 @Component({
   selector: 'app-user-home',
@@ -13,6 +16,7 @@ import { CommonModule } from '@angular/common';
     UserHeaderComponent,
     ChatListComponent,
     ChatWindowComponent,
+    SearchComponent,
     CommonModule,
   ],
   templateUrl: './user-home.component.html',
@@ -40,8 +44,6 @@ export class UserHomeComponent {
   }
 
   loadChats() {
-    console.log('initialized');
-
     this.authService.userId$.subscribe((id) => {
       if (!id) {
         return;
@@ -82,7 +84,16 @@ export class UserHomeComponent {
       time: 'just now',
     });
 
-    // Emit socket event
     this.socketService.sendMessage(payload);
+  }
+
+  results: UserSearchResultResponse[] = [];
+
+  onSearch(query: string) {
+    this.chatService
+      .searchUsers(query)
+      .subscribe((res: ApiResponse<UserSearchResultResponse[]>) => {
+        this.results = res.data ? res.data : [];
+      });
   }
 }
