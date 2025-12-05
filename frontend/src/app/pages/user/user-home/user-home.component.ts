@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { UserHeaderComponent } from '../../../components/user/user-header/user-header.component';
 import { ChatListComponent } from '../../../components/shared/chat-list/chat-list.component';
 import { ChatWindowComponent } from '../../../components/shared/chat-window/chat-window.component';
@@ -9,6 +9,7 @@ import { CommonModule } from '@angular/common';
 import { SearchComponent } from '../../../components/shared/search/search.component';
 import { UserSearchResultResponse } from '../../../interfaces/user.interface';
 import { ApiResponse } from '../../../interfaces/common-interface';
+import { IChat } from '../../../interfaces/chat.interface';
 
 @Component({
   selector: 'app-user-home',
@@ -22,8 +23,8 @@ import { ApiResponse } from '../../../interfaces/common-interface';
   templateUrl: './user-home.component.html',
   styleUrl: './user-home.component.css',
 })
-export class UserHomeComponent {
-  chats: any[] = [];
+export class UserHomeComponent implements OnInit {
+  chats: IChat[] = [];
   messages: any[] = [];
   activeChat: any = null;
 
@@ -49,9 +50,12 @@ export class UserHomeComponent {
         return;
       }
       this.loggedInUserId = id;
-      this.chatService.getChats(this.loggedInUserId).subscribe((res: any) => {
-        this.chats = res;
-      });
+      this.chatService
+        .getChats(this.loggedInUserId)
+        .subscribe((res: ApiResponse<IChat[]>) => {
+          this.chats = res.data || [];
+          console.log(this.chats);
+        });
     });
   }
 

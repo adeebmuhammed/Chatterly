@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { IChat } from '../../../interfaces/chat.interface';
 
 @Component({
   selector: 'app-chat-list',
@@ -10,10 +11,17 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './chat-list.component.css'
 })
 export class ChatListComponent {
-  @Input() chats: any[] = [];
+  @Input() chats: IChat[] = [];
   @Output() selectChatEmitter = new EventEmitter<any>();
 
   selectChat(chat: any) {
     this.selectChatEmitter.emit(chat);
+  }
+
+  private loggedInUserId: string = localStorage.getItem('userId') || '';
+
+  getOtherParticipantName(chat: any): string {
+    return chat.participants
+      .find((user: any) => user._id !== this.loggedInUserId)?.name || 'Unknown User';
   }
 }

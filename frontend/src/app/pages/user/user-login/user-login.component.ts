@@ -1,5 +1,10 @@
 import { Component, inject, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AuthService } from '../../../services/auth/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
@@ -9,15 +14,11 @@ import { UserHeaderComponent } from '../../../components/user/user-header/user-h
 
 @Component({
   selector: 'app-user-login',
-  imports: [
-    UserHeaderComponent,
-    ReactiveFormsModule,
-    RouterLink
-  ],
+  imports: [UserHeaderComponent, ReactiveFormsModule, RouterLink],
   templateUrl: './user-login.component.html',
-  styleUrl: './user-login.component.css'
+  styleUrl: './user-login.component.css',
 })
-export class UserLoginComponent implements OnDestroy{
+export class UserLoginComponent implements OnDestroy {
   loginForm: FormGroup;
   errorMessage = '';
 
@@ -40,8 +41,7 @@ export class UserLoginComponent implements OnDestroy{
         .userSignin({ email, password })
         .pipe(takeUntil(this.componentDestroyed$))
         .subscribe({
-          next: (res) => {
-
+          next: () => {
             Swal.fire({
               icon: 'success',
               title: 'Login Successful',

@@ -1,12 +1,15 @@
 import { MessageResponseDto } from "../../dto/base.dto";
-import { UserRegisterRequestDto, UserSearchResultDto } from "../../dto/user.dto";
-import { IUser } from "../../models/user.model";
+import {
+  UserLoginResponseDto,
+  UserRegisterRequestDto,
+  UserSearchResultDto,
+} from "../../dto/user.dto";
 
 export interface IUserService {
   login(
     email: string,
     password: string
-  ): Promise<{ loginResponse: MessageResponseDto }>;
+  ): Promise<{ loginResponse: UserLoginResponseDto }>;
   signup(
     userData: UserRegisterRequestDto
   ): Promise<{ signupResponse: MessageResponseDto }>;
@@ -18,9 +21,7 @@ export interface IUserService {
       user: { name: string; id: string };
     };
   }>;
-  resendOTP(
-    email: string
-  ): Promise<{
+  resendOTP(email: string): Promise<{
     resendOTPResponse: MessageResponseDto & { user: { name: string } };
   }>;
   searchUsers(query: string): Promise<{ users: UserSearchResultDto[] }>;

@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { FILE_TYPES } from "../utils/constants";
 
 export interface IMessage extends Document {
+  _id: mongoose.Types.ObjectId;
   chatId: mongoose.Types.ObjectId;
   sender: mongoose.Types.ObjectId;
   message: string;

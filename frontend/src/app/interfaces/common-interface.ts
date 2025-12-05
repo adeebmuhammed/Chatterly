@@ -4,3 +4,9 @@ export interface ApiResponse<T> {
     data?: T;
     error?: Error;
 }
+
+export enum FILE_TYPES {
+  TEXT = "text",
+  IMAGE = "image",
+  FILE = "file",
+}

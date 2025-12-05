@@ -23,7 +23,7 @@ routes
 routes.get("/search-users", userController.searchUsers);
 
 routes
-  .get("/chat/:userId", chatController.findOrCreateChat)
+  .get("/chat/:userId", chatController.getUserChats)
   .post("/chat/find-or-create", chatController.findOrCreateChat);
 
 routes

@@ -1,8 +1,9 @@
 import { IChat } from "../../models/chat.model";
 
 export interface IChatService {
-  findOrCreateChat: (
+  findOrCreateChat(
     userId: string,
     otherUserId: string
-  ) => Promise<{findOrCreateChatResponse: IChat}>;
+  ): Promise<{ findOrCreateChatResponse: IChat }>;
+  getUserChats(userId: string): Promise<{ userChats: IChat[] }>;
 }
