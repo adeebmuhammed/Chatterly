@@ -10,6 +10,8 @@ import { SearchComponent } from '../../../components/shared/search/search.compon
 import { UserSearchResultResponse } from '../../../interfaces/user.interface';
 import { ApiResponse } from '../../../interfaces/common-interface';
 import { IChat } from '../../../interfaces/chat.interface';
+import { IMessage } from '../../../interfaces/message.interface';
+import { FILE_TYPES } from '../../../constants/constants';
 
 @Component({
   selector: 'app-user-home',
@@ -25,10 +27,11 @@ import { IChat } from '../../../interfaces/chat.interface';
 })
 export class UserHomeComponent implements OnInit {
   chats: IChat[] = [];
-  messages: any[] = [];
+  messages: IMessage[] = [];
   activeChat: any = null;
 
   loggedInUserId = '';
+  loggedInUserName = localStorage.getItem('userName') || '';
 
   private chatService = inject(ChatService);
   private socketService = inject(SocketService);
@@ -38,7 +41,7 @@ export class UserHomeComponent implements OnInit {
     this.loadChats();
 
     this.socketService.onMessage((msg: any) => {
-      if (msg.conversationId === this.activeChat?._id) {
+      if (msg.chatId === this.activeChat?._id) {
         this.messages.push(msg);
       }
     });
@@ -59,34 +62,30 @@ export class UserHomeComponent implements OnInit {
     });
   }
 
-  onChatSelected(chat: any) {
+  onChatSelected(chat: IChat) {
     this.activeChat = chat;
 
     this.socketService.joinRoom(chat._id);
 
-    this.chatService.getMessages(chat._id).subscribe((res: any) => {
-      this.messages = res;
-    });
+    this.chatService
+      .getMessages(chat._id)
+      .subscribe((res: ApiResponse<IMessage[]>) => {
+        this.messages = res.data || [];
+        console.log(this.messages);
+      });
   }
 
   onSendMessage(text: string) {
     if (!this.activeChat) return;
 
     const payload = {
-      conversationId: this.activeChat._id,
+      chatId: this.activeChat._id,
       senderId: this.loggedInUserId,
       message: text,
     };
 
     // Save to DB
     this.chatService.sendMessage(payload).subscribe();
-
-    // Push instantly to UI
-    this.messages.push({
-      text,
-      isMine: true,
-      time: 'just now',
-    });
 
     this.socketService.sendMessage(payload);
   }

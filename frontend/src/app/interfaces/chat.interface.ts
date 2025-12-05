@@ -1,5 +1,5 @@
 export interface IChat {
-  id: string;
+  _id: string;
   participants: string[];
   isGroup: boolean;
   groupName?: string;

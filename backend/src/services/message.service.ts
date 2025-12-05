@@ -4,11 +4,14 @@ import { IMessageRepository } from "../repositories/interfaces/IMessageRepositor
 import mongoose from "mongoose";
 import { IMessage } from "../models/message.model";
 import { IMessageService } from "./interfaces/IMessageService";
+import { IChat } from "../models/chat.model";
+import { IChatRepository } from "../repositories/interfaces/IChatRepository";
 
 @injectable()
 export class MessageService implements IMessageService {
   constructor(
-    @inject(TYPES.IMessageRepository) private _messageRepo: IMessageRepository
+    @inject(TYPES.IMessageRepository) private _messageRepo: IMessageRepository,
+    @inject(TYPES.IChatRepository) private _chatRepo: IChatRepository
   ) {}
 
   sendMessage = async (
@@ -16,6 +19,11 @@ export class MessageService implements IMessageService {
     senderId: string,
     message: string
   ): Promise<{ sendMessageResponse: IMessage }> => {
+    const chat = await this._chatRepo.findById(chatId);
+    if (!chat) {
+      throw new Error("Chat not found");
+    }
+
     const sendMessageResponse = await this._messageRepo.create({
       chatId: new mongoose.Types.ObjectId(chatId),
       sender: new mongoose.Types.ObjectId(senderId),
@@ -31,6 +39,7 @@ export class MessageService implements IMessageService {
     const getMessagesResponse = await this._messageRepo.getMessagesByChat(
       chatId
     );
+
     return { getMessagesResponse };
   };
 }

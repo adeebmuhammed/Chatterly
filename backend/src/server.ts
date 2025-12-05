@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db";
 import routes from "./routes/routes";
@@ -35,14 +35,21 @@ io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
   // Join room
-  socket.on("joinRoom", (roomId: string) => {
-    socket.join(roomId);
-    console.log(`User ${socket.id} joined room ${roomId}`);
+  socket.on("joinRoom", (chatId: string) => {
+    socket.join(chatId);
+    console.log(`User ${socket.id} joined room ${chatId}`);
   });
 
   // Receive message and broadcast to room
   socket.on("sendMessage", (data) => {
-    io.to(data.roomId).emit("receiveMessage", data);
+    const messageToSend = {
+      chatId: data.chatId,
+      sender: { _id: data.senderId },
+      message: data.message,
+      createdAt: new Date(),
+    };
+
+    io.to(data.chatId).emit("receiveMessage", messageToSend);
   });
 
   socket.on("disconnect", () => {

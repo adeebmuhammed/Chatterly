@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../../interfaces/common-interface';
 import { UserSearchResultResponse } from '../../interfaces/user.interface';
 import { IChat } from '../../interfaces/chat.interface';
+import { IMessage } from '../../interfaces/message.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -41,8 +42,10 @@ export class ChatService {
   }
 
   // Load messages for a chat
-  getMessages(chatId: string) {
-    return this.http.get(`${this.baseUrl}/message/${chatId}`);
+  getMessages(chatId: string): Observable<ApiResponse<IMessage[]>> {
+    return this.http.get<ApiResponse<IMessage[]>>(
+      `${this.baseUrl}/message/${chatId}`
+    );
   }
 
   // Send a message

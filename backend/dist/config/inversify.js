@@ -1,0 +1,28 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.container = void 0;
+const inversify_1 = require("inversify");
+const types_1 = require("./types");
+const user_controller_1 = require("../controllers/user.controller");
+const user_service_1 = require("../services/user.service");
+const user_repository_1 = require("../repositories/user.repository");
+const otp_repository_1 = require("../repositories/otp.repository");
+const chat_repository_1 = require("../repositories/chat.repository");
+const message_repository_1 = require("../repositories/message.repository");
+const chat_controller_1 = require("../controllers/chat.controller");
+const chat_service_1 = require("../services/chat.service");
+const message_service_1 = require("../services/message.service");
+const message_controller_1 = require("../controllers/message.controller");
+const container = new inversify_1.Container();
+exports.container = container;
+container.bind(types_1.TYPES.IUserController).to(user_controller_1.UserController);
+container.bind(types_1.TYPES.IUserService).to(user_service_1.UserService);
+container.bind(types_1.TYPES.IUserRepository).to(user_repository_1.UserRepository);
+container.bind(types_1.TYPES.IOtpRepository).to(otp_repository_1.OtpRepository);
+container.bind(types_1.TYPES.IChatController).to(chat_controller_1.ChatController);
+container.bind(types_1.TYPES.IChatService).to(chat_service_1.ChatService);
+container.bind(types_1.TYPES.IChatRepository).to(chat_repository_1.ChatRepository);
+container.bind(types_1.TYPES.IMessageService).to(message_service_1.MessageService);
+container.bind(types_1.TYPES.IMessageController).to(message_controller_1.MessageController);
+container.bind(types_1.TYPES.IMessageRepository).to(message_repository_1.MessageRepository);
+//# sourceMappingURL=inversify.js.map

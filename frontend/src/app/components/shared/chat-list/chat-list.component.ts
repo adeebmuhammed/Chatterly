@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IChat } from '../../../interfaces/chat.interface';
+import { UserChat } from '../../../interfaces/user.interface';
 
 @Component({
   selector: 'app-chat-list',
@@ -21,7 +22,9 @@ export class ChatListComponent {
   private loggedInUserId: string = localStorage.getItem('userId') || '';
 
   getOtherParticipantName(chat: any): string {
-    return chat.participants
-      .find((user: any) => user._id !== this.loggedInUserId)?.name || 'Unknown User';
+    return (
+      chat.participants.find((user: any) => user._id !== this.loggedInUserId)
+        ?.name || 'Unknown User'
+    );
   }
 }

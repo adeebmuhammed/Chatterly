@@ -1,36 +1,47 @@
 <div class="chat-window">
-
   <!-- Header -->
   <div class="chat-header">
     <img class="avatar" src="user.png" />
-    <div class="user-info">
-      <h3>{{ activeChat?.name }}</h3>
-      <p>online</p>
+    <div class="chat-name">
+      <!-- Group Chat -->
+      <ng-container *ngIf="activeChat?.isGroup; else privateChat">
+        {{ activeChat?.groupName || "Unnamed Group" }}
+      </ng-container>
+
+      <!-- Private Chat -->
+      <ng-template #privateChat>
+        {{ getOtherParticipantName(activeChat) }}
+      </ng-template>
     </div>
   </div>
 
   <!-- Messages -->
   <div class="messages" id="messageArea">
-    <div 
+    <div
       class="message"
-      [ngClass]="{ 'sent': msg.isMine, 'received': !msg.isMine }"
       *ngFor="let msg of messages"
+      [ngClass]="{
+        sent: msg.sender._id === loggedInUserId,
+        received: msg.sender._id !== loggedInUserId
+      }"
     >
-      {{ msg.text }}
-      <span class="time">{{ msg.time }}</span>
+      {{ msg.message }}
+
+      <span class="time">
+        {{ msg.createdAt | date : "shortTime" }}
+      </span>
     </div>
   </div>
 
   <!-- Input -->
   <div class="chat-input">
-    <input 
-      type="text" 
-      [(ngModel)]="messageText" 
-      placeholder="Type a message..." 
+    <input
+      type="text"
+      [(ngModel)]="messageText"
+      placeholder="Type a message..."
       (keyup.enter)="send()"
     />
 
     <button (click)="send()">Send</button>
   </div>
-
 </div>

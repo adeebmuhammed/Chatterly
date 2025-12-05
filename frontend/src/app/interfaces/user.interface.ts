@@ -17,3 +17,11 @@ export interface UserLoginResponse {
   token: string;
   message: string;
 }
+
+export interface UserChat {
+  status: 'online' | 'offline';
+  lastSeen: null;
+  _id: string;
+  name: string;
+  email: string;
+}
