@@ -19,4 +19,12 @@ export class SocketService {
   onMessage(callback: any) {
     this.socket.on('receiveMessage', callback);
   }
+
+  registerUser(userId: string) {
+    this.socket.emit("registerUser", userId);
+  }
+
+  onNewChat(callback: any) {
+    this.socket.on('newChat', callback);
+  }
 }

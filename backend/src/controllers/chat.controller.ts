@@ -28,6 +28,11 @@ export class ChatController implements IChatController {
       const { findOrCreateChatResponse } =
         await this._chatService.findOrCreateChat(userId, otherUserId);
 
+      const io = req.app.get("io");
+
+  // Notify the other user
+  io.to(otherUserId).emit("newChat", findOrCreateChatResponse);
+
       res
         .status(200)
         .json(

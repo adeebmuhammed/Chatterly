@@ -12,13 +12,24 @@ export class ChatRepository extends BaseRepository<IChat> {
     let chat = await Chats.findOne({
       isGroup: false,
       participants: { $all: [user1, user2] },
-    });
+    })
+      .populate("participants", "name email status lastSeen")
+      .exec();
 
+    // Create if not exists
     if (!chat) {
       chat = await Chats.create({
         participants: [user1, user2],
         isGroup: false,
       });
+
+      chat = await Chats.findById(chat._id)
+        .populate("participants", "name email status lastSeen")
+        .exec();
+      
+      if (!chat) {
+        throw new Error("Failed to create chat");
+      }
     }
 
     return chat;

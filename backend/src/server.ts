@@ -34,6 +34,11 @@ const io = new SocketIOServer(server, {
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  socket.on("registerUser", (userId: string) => {
+    socket.join(userId); // Join personal user room
+    console.log(`User ${socket.id} registered as ${userId}`);
+  });
+
   // Join room
   socket.on("joinRoom", (chatId: string) => {
     socket.join(chatId);

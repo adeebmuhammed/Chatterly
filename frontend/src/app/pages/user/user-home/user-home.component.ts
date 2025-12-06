@@ -30,15 +30,25 @@ export class UserHomeComponent implements OnInit {
   messages: IMessage[] = [];
   activeChat: any = null;
 
-  loggedInUserId = '';
+  loggedInUserId = localStorage.getItem('userId') || '';
   loggedInUserName = localStorage.getItem('userName') || '';
 
   private chatService = inject(ChatService);
   private socketService = inject(SocketService);
   private authService = inject(AuthService);
 
-  ngOnInit(): void {
-    this.loadChats();
+  ngOnInit() {
+    this.authService.userId$.subscribe((userId) => {
+      if (userId) {
+        this.loggedInUserId = userId;
+        this.socketService.registerUser(userId); // important!
+        this.loadChats();
+      }
+    });
+
+    this.socketService.onNewChat((chat: IChat) => {
+      this.chats.unshift(chat); // Add new chat live
+    });
 
     this.socketService.onMessage((msg: any) => {
       if (msg.chatId === this.activeChat?._id) {
