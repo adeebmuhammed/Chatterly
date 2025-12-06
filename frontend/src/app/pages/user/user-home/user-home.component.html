@@ -4,7 +4,8 @@
 <div class="top-search-bar">
   <app-search
     [searchResults]="results"
-    (search)="onSearch($event)">
+    (search)="onSearch($event)"
+    (userSelected)="onUserSelected($event)">
   </app-search>
 </div>
 

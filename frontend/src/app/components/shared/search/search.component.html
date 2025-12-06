@@ -12,7 +12,11 @@
     <div class="loading" *ngIf="isLoading">Searching...</div>
 
     <ul *ngIf="!isLoading && searchResults && searchResults.length > 0">
-      <li *ngFor="let result of searchResults" class="dropdown-item">
+      <li
+        *ngFor="let result of searchResults"
+        class="dropdown-item"
+        (click)="onResultClick(result)"
+      >
         {{ result.name }}
       </li>
     </ul>

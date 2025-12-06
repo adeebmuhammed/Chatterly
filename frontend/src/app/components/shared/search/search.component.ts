@@ -20,6 +20,12 @@ export class SearchComponent implements OnChanges {
 
   @Input() searchResults: UserSearchResultResponse[] = [];
   @Output() search = new EventEmitter<string>();
+  @Output() userSelected = new EventEmitter<UserSearchResultResponse>();
+
+  onResultClick(result: UserSearchResultResponse) {
+    this.userSelected.emit(result);
+    this.searchQuery = '';
+  }
 
   constructor() {
     this.searchSubject

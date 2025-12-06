@@ -63,16 +63,7 @@ export class UserHomeComponent implements OnInit {
   }
 
   onChatSelected(chat: IChat) {
-    this.activeChat = chat;
-
-    this.socketService.joinRoom(chat._id);
-
-    this.chatService
-      .getMessages(chat._id)
-      .subscribe((res: ApiResponse<IMessage[]>) => {
-        this.messages = res.data || [];
-        console.log(this.messages);
-      });
+    this.openChat(chat);
   }
 
   onSendMessage(text: string) {
@@ -97,6 +88,40 @@ export class UserHomeComponent implements OnInit {
       .searchUsers(query)
       .subscribe((res: ApiResponse<UserSearchResultResponse[]>) => {
         this.results = res.data ? res.data : [];
+      });
+  }
+
+  onUserSelected(user: UserSearchResultResponse) {
+    const payload = {
+      userId: this.loggedInUserId,
+      otherUserId: user.id,
+    };
+
+    this.chatService.findOrCreateChat(payload).subscribe({
+      next: (res: ApiResponse<IChat>) => {
+        const chat = res.data;
+        if (!chat) return;
+        const existingChat = this.chats.find((c) => c._id === chat._id);
+        if (!existingChat) {
+          this.chats.unshift(chat);
+        }
+        this.openChat(chat);
+      },
+      error: (err) => {
+        console.error('Error finding or creating chat:', err);
+      },
+    });
+  }
+
+  openChat(chat: IChat) {
+    this.activeChat = chat;
+
+    this.socketService.joinRoom(chat._id);
+
+    this.chatService
+      .getMessages(chat._id)
+      .subscribe((res: ApiResponse<IMessage[]>) => {
+        this.messages = res.data || [];
       });
   }
 }
