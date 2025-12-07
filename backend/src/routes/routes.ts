@@ -33,10 +33,9 @@ routes
   .post("/message/send", messageController.sendMessage)
   .get("/message/:chatId", messageController.getMessages);
 
-routes
-  .post("/group/create", groupController.createGroup)
-  .patch("/group/join", groupController.joinGroup)
-  .patch("/group/leave", groupController.leaveGroup);
+routes.post("/group/create", groupController.createGroup.bind(groupController));
+routes.patch("/group/join", groupController.joinGroup.bind(groupController));
+routes.patch("/group/leave", groupController.leaveGroup.bind(groupController));
 
 routes.post("/notifications/subscribe", saveSubscription);
 

@@ -12,7 +12,7 @@ export class GroupController implements IGroupController {
     @inject(TYPES.IGroupService) private _groupService: IGroupService
   ) {}
 
-  async createGroup(req: Request, res: Response) {
+  async createGroup(req: Request, res: Response): Promise<void> {
     try {
       const { creatorId, userIds, groupName } = req.body;
 
@@ -28,11 +28,11 @@ export class GroupController implements IGroupController {
     } catch (error) {
       res
         .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .json(sendError("Failed to create group", error));
+        .json(sendError(error instanceof Error? error.message : "failed to create group chat"));
     }
   }
 
-  async joinGroup(req: Request, res: Response) {
+  async joinGroup(req: Request, res: Response): Promise<void> {
     try {
       const { chatId, userId } = req.body;
 
@@ -48,7 +48,7 @@ export class GroupController implements IGroupController {
     }
   }
 
-  async leaveGroup(req: Request, res: Response) {
+  async leaveGroup(req: Request, res: Response): Promise<void> {
     try {
       const { chatId, userId } = req.body;
 

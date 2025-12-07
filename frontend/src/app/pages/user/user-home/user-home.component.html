@@ -5,34 +5,45 @@
   <app-search
     [searchResults]="results"
     (search)="onSearch($event)"
-    (userSelected)="onUserSelected($event)">
+    (userSelected)="onUserSelected($event)"
+  >
   </app-search>
 </div>
 
 <div class="chat-container">
-
-  <!-- Left: Chat List -->
+  <!-- LEFT PANEL -->
   <div class="left-panel">
-    <app-chat-list 
-      [chats]="chats" 
-      (selectChatEmitter)="onChatSelected($event)">
+    <!-- Create Group Button -->
+    <div class="create-group-btn-wrapper">
+      <button class="create-group-btn" (click)="openCreateGroupModal()">
+        ➕ Create Group
+      </button>
+    </div>
+
+    <app-chat-list [chats]="chats" (selectChatEmitter)="onChatSelected($event)">
     </app-chat-list>
   </div>
 
   <!-- Right: Chat Window -->
   <div class="right-panel">
     <ng-container *ngIf="activeChat; else noChat">
-      <app-chat-window 
+      <app-chat-window
         [messages]="messages"
         [activeChat]="activeChat"
-        (sendMessageEmitter)="onSendMessage($event)">
+        (sendMessageEmitter)="onSendMessage($event)"
+      >
       </app-chat-window>
     </ng-container>
 
     <ng-template #noChat>
-      <div class="no-chat-selected">
-        Select a chat to start messaging
-      </div>
+      <div class="no-chat-selected">Select a chat to start messaging</div>
     </ng-template>
   </div>
+
+  <app-create-group
+    [visible]="showGroupModal"
+    [allUsers]="allUsersList"
+    (closeModal)="closeGroupModal()"
+    (createGroup)="onCreateGroup($event)"
+  ></app-create-group>
 </div>

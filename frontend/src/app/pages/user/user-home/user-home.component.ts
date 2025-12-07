@@ -13,6 +13,9 @@ import { IChat, IChatUI } from '../../../interfaces/chat.interface';
 import { IMessage } from '../../../interfaces/message.interface';
 import { FILE_TYPES } from '../../../constants/constants';
 import { NotificationService } from '../../../services/notification/notification.service';
+import { GroupService } from '../../../services/group/group.service';
+import { CreateGroupComponent } from '../../../components/shared/create-group/create-group.component';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user-home',
@@ -22,6 +25,7 @@ import { NotificationService } from '../../../services/notification/notification
     ChatWindowComponent,
     SearchComponent,
     CommonModule,
+    CreateGroupComponent,
   ],
   templateUrl: './user-home.component.html',
   styleUrl: './user-home.component.css',
@@ -30,6 +34,8 @@ export class UserHomeComponent implements OnInit {
   chats: IChatUI[] = [];
   messages: IMessage[] = [];
   activeChat: IChatUI | null = null;
+  showGroupModal = false;
+  allUsersList: UserSearchResultResponse[] = [];
 
   loggedInUserId = localStorage.getItem('userId') || '';
   loggedInUserName = localStorage.getItem('userName') || '';
@@ -38,6 +44,7 @@ export class UserHomeComponent implements OnInit {
   private socketService = inject(SocketService);
   private authService = inject(AuthService);
   private notificationService = inject(NotificationService);
+  private groupService = inject(GroupService);
 
   ngOnInit() {
     this.authService.userId$.subscribe((userId) => {
@@ -66,6 +73,39 @@ export class UserHomeComponent implements OnInit {
     });
 
     this.notificationService.subscribeToNotifications();
+  }
+
+  openCreateGroupModal() {
+    this.showGroupModal = true;
+
+    // fetch the list of all users (except self)
+    this.chatService.searchUsers('').subscribe((res) => {
+      this.allUsersList =
+        res.data?.filter((u) => u.id !== this.loggedInUserId) || [];
+    });
+  }
+
+  closeGroupModal() {
+    this.showGroupModal = false;
+  }
+
+  onCreateGroup(data: { groupName: string; users: string[] }) {
+    this.groupService
+      .createGroup(this.loggedInUserId, data.groupName, data.users)
+      .subscribe({
+        next: (res: ApiResponse<IChat>) => {
+          Swal.fire("Success", res.message || "Group Chat Created Successfully", "success")
+          if (res.data) {
+            this.chats.unshift(res.data);
+            this.onChatSelected(res.data);
+          }
+        },
+        error: (err) => {
+          Swal.fire("Error", err.message || "Group Chat Creation Failed", "error")
+          console.error(err)},
+      });
+
+    this.showGroupModal = false;
   }
 
   loadChats() {

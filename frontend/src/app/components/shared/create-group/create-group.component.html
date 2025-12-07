@@ -1,0 +1,27 @@
+<div class="modal-backdrop" *ngIf="visible">
+  <div class="modal-content">
+
+    <h2>Create Group</h2>
+
+    <!-- Group Name -->
+    <input type="text" [(ngModel)]="groupName" placeholder="Group Name" />
+
+    <h4>Select users</h4>
+    <div class="user-list">
+      <div 
+        *ngFor="let user of allUsers"
+        class="user-item"
+        [class.selected]="selectedUsers.includes(user.id)"
+        (click)="toggleUser(user.id)"
+      >
+        {{ user.name }}
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button (click)="closeModal.emit()">Cancel</button>
+      <button class="create-btn" (click)="onCreate()">Create</button>
+    </div>
+
+  </div>
+</div>
