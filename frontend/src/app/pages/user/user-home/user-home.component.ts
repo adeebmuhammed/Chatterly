@@ -12,6 +12,7 @@ import { ApiResponse } from '../../../interfaces/common-interface';
 import { IChat, IChatUI } from '../../../interfaces/chat.interface';
 import { IMessage } from '../../../interfaces/message.interface';
 import { FILE_TYPES } from '../../../constants/constants';
+import { NotificationService } from '../../../services/notification/notification.service';
 
 @Component({
   selector: 'app-user-home',
@@ -36,6 +37,7 @@ export class UserHomeComponent implements OnInit {
   private chatService = inject(ChatService);
   private socketService = inject(SocketService);
   private authService = inject(AuthService);
+  private notificationService = inject(NotificationService);
 
   ngOnInit() {
     this.authService.userId$.subscribe((userId) => {
@@ -62,6 +64,8 @@ export class UserHomeComponent implements OnInit {
         this.markChatAsUnread(data.chatId, data);
       }
     });
+
+    this.notificationService.subscribeToNotifications();
   }
 
   loadChats() {

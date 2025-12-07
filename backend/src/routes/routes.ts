@@ -4,6 +4,7 @@ import { IUserController } from "../controllers/interfaces/IUserController";
 import { TYPES } from "../config/types";
 import { IChatController } from "../controllers/interfaces/IChatController";
 import { IMessageController } from "../controllers/interfaces/IMessageController";
+import { saveSubscription } from "../utils/notification";
 
 const userController = container.get<IUserController>(TYPES.IUserController);
 const chatController = container.get<IChatController>(TYPES.IChatController);
@@ -29,5 +30,9 @@ routes
 routes
   .post("/message/send", messageController.sendMessage)
   .get("/message/:chatId", messageController.getMessages);
+
+routes
+  .post("/notifications/subscribe", saveSubscription);
+
 
 export default routes;

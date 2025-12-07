@@ -1,15 +1,16 @@
 import express from "express";
 import dotenv from "dotenv";
+dotenv.config();
 import connectDB from "./config/db";
 import routes from "./routes/routes";
 import cors from "cors";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
+import { sendPushNotification } from "./utils/notification";
 
 const app = express();
 app.use(express.json());
 
-dotenv.config();
 connectDB();
 
 app.use(
@@ -53,6 +54,15 @@ io.on("connection", (socket) => {
       message: data.message,
       createdAt: new Date(),
     };
+
+    const messageData = {
+      title: "New Message",
+      body: data.message,
+      chatId: data.chatId,
+      senderId: data.senderId,
+    };
+
+    sendPushNotification(messageData);
 
     // 1️⃣ Send to users inside the chat room
     io.to(data.chatId).emit("receiveMessage", messageToSend);
