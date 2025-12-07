@@ -54,7 +54,17 @@ io.on("connection", (socket) => {
       createdAt: new Date(),
     };
 
+    // 1️⃣ Send to users inside the chat room
     io.to(data.chatId).emit("receiveMessage", messageToSend);
+
+    // 2️⃣ Notify the other user
+    const receiverId = data.receiverId; // ADD THIS IN PAYLOAD
+    io.to(receiverId).emit("newMessageNotification", {
+      chatId: data.chatId,
+      message: data.message,
+      senderId: data.senderId,
+      createdAt: new Date(),
+    });
   });
 
   socket.on("disconnect", () => {

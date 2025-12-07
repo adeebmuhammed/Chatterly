@@ -1,17 +1,12 @@
 <div class="chat-list-wrapper">
-  <div
-    class="chat-item"
-    *ngFor="let chat of chats"
-    (click)="selectChat(chat)"
-  >
+  <div class="chat-item" *ngFor="let chat of chats" (click)="selectChat(chat)">
     <img class="avatar" src="user.png" />
 
     <div class="chat-info">
-
       <div class="chat-name">
         <!-- Group Chat -->
         <ng-container *ngIf="chat.isGroup; else privateChat">
-          {{ chat.groupName || 'Unnamed Group' }}
+          {{ chat.groupName || "Unnamed Group" }}
         </ng-container>
 
         <!-- Private Chat -->
@@ -25,8 +20,11 @@
 
     <div class="chat-meta">
       <div class="time">
-        {{ chat.updatedAt | date:'shortTime' }}
+        {{ chat.updatedAt | date : "shortTime" }}
       </div>
+
+      <!-- UNREAD BADGE -->
+      <div *ngIf="chat.hasUnread" class="unread-badge">●</div>
     </div>
   </div>
 </div>

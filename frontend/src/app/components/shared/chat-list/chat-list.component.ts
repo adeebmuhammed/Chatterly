@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { IChat } from '../../../interfaces/chat.interface';
+import { IChat, IChatUI } from '../../../interfaces/chat.interface';
 import { UserChat } from '../../../interfaces/user.interface';
 
 @Component({
@@ -12,7 +12,7 @@ import { UserChat } from '../../../interfaces/user.interface';
   styleUrl: './chat-list.component.css'
 })
 export class ChatListComponent {
-  @Input() chats: IChat[] = [];
+  @Input() chats: IChatUI[] = [];
   @Output() selectChatEmitter = new EventEmitter<any>();
 
   selectChat(chat: any) {

@@ -21,10 +21,14 @@ export class SocketService {
   }
 
   registerUser(userId: string) {
-    this.socket.emit("registerUser", userId);
+    this.socket.emit('registerUser', userId);
   }
 
   onNewChat(callback: any) {
     this.socket.on('newChat', callback);
+  }
+
+  onNewMessageNotification(callback: any) {
+    this.socket.on('newMessageNotification', callback);
   }
 }

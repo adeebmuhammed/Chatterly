@@ -1,3 +1,5 @@
+import { UserStatus } from "./common-interface";
+
 export interface resendOtpInterface {
   user: { name: string; id: string };
 }
@@ -13,13 +15,13 @@ export interface UserLoginResponse {
   name: string;
   email: string;
   phone: string;
-  status: string;
+  status: UserStatus;
   token: string;
   message: string;
 }
 
 export interface UserChat {
-  status: 'online' | 'offline';
+  status: UserStatus;
   lastSeen: null;
   _id: string;
   name: string;

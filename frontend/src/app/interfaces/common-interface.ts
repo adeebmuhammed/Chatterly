@@ -4,3 +4,8 @@ export interface ApiResponse<T> {
     data?: T;
     error?: Error;
 }
+
+export enum UserStatus {
+    ONLINE = 'online',
+    OFFLINE = 'offline'
+}

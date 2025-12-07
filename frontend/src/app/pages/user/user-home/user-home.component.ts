@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { SearchComponent } from '../../../components/shared/search/search.component';
 import { UserSearchResultResponse } from '../../../interfaces/user.interface';
 import { ApiResponse } from '../../../interfaces/common-interface';
-import { IChat } from '../../../interfaces/chat.interface';
+import { IChat, IChatUI } from '../../../interfaces/chat.interface';
 import { IMessage } from '../../../interfaces/message.interface';
 import { FILE_TYPES } from '../../../constants/constants';
 
@@ -26,9 +26,9 @@ import { FILE_TYPES } from '../../../constants/constants';
   styleUrl: './user-home.component.css',
 })
 export class UserHomeComponent implements OnInit {
-  chats: IChat[] = [];
+  chats: IChatUI[] = [];
   messages: IMessage[] = [];
-  activeChat: any = null;
+  activeChat: IChatUI | null = null;
 
   loggedInUserId = localStorage.getItem('userId') || '';
   loggedInUserName = localStorage.getItem('userName') || '';
@@ -55,6 +55,13 @@ export class UserHomeComponent implements OnInit {
         this.messages.push(msg);
       }
     });
+
+    this.socketService.onNewMessageNotification((data: IMessage) => {
+      // If the user is not inside the chat → mark as unread
+      if (data.chatId !== this.activeChat?._id) {
+        this.markChatAsUnread(data.chatId, data);
+      }
+    });
   }
 
   loadChats() {
@@ -78,16 +85,14 @@ export class UserHomeComponent implements OnInit {
 
   onSendMessage(text: string) {
     if (!this.activeChat) return;
-
     const payload = {
       chatId: this.activeChat._id,
       senderId: this.loggedInUserId,
+      receiverId: this.getOtherUserId(this.activeChat), // Write helper method below
       message: text,
     };
 
-    // Save to DB
     this.chatService.sendMessage(payload).subscribe();
-
     this.socketService.sendMessage(payload);
   }
 
@@ -126,6 +131,9 @@ export class UserHomeComponent implements OnInit {
   openChat(chat: IChat) {
     this.activeChat = chat;
 
+    // Clear unread
+    (chat as IChatUI).hasUnread = false;
+
     this.socketService.joinRoom(chat._id);
 
     this.chatService
@@ -133,5 +141,22 @@ export class UserHomeComponent implements OnInit {
       .subscribe((res: ApiResponse<IMessage[]>) => {
         this.messages = res.data || [];
       });
+  }
+
+  getOtherUserId(chat: IChat) {
+    if (!chat || !chat.participants) return;
+    return chat.participants.find((p) => p._id !== this.loggedInUserId)?._id;
+  }
+
+  markChatAsUnread(chatId: string, message: any) {
+    const chat = this.chats.find((c) => c._id === chatId);
+    if (!chat) return;
+
+    (chat as IChatUI).hasUnread = true;
+    (chat as IChatUI).lastMessage = message.message;
+    chat.updatedAt = new Date(); // move chat up
+
+    // Move chat to top of list just like WhatsApp
+    this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
   }
 }
