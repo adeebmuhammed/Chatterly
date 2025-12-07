@@ -5,12 +5,14 @@ import { TYPES } from "../config/types";
 import { IChatController } from "../controllers/interfaces/IChatController";
 import { IMessageController } from "../controllers/interfaces/IMessageController";
 import { saveSubscription } from "../utils/notification";
+import { IGroupController } from "../controllers/interfaces/IGroupController";
 
 const userController = container.get<IUserController>(TYPES.IUserController);
 const chatController = container.get<IChatController>(TYPES.IChatController);
 const messageController = container.get<IMessageController>(
   TYPES.IMessageController
 );
+const groupController = container.get<IGroupController>(TYPES.IGroupController);
 
 const routes = Router();
 
@@ -32,7 +34,10 @@ routes
   .get("/message/:chatId", messageController.getMessages);
 
 routes
-  .post("/notifications/subscribe", saveSubscription);
+  .post("/group/create", groupController.createGroup)
+  .patch("/group/join", groupController.joinGroup)
+  .patch("/group/leave", groupController.leaveGroup);
 
+routes.post("/notifications/subscribe", saveSubscription);
 
 export default routes;

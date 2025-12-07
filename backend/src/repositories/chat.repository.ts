@@ -1,6 +1,7 @@
 import { injectable } from "inversify";
 import { BaseRepository } from "./base.repository";
 import Chats, { IChat } from "../models/chat.model";
+import { DeleteResult } from "mongoose";
 
 @injectable()
 export class ChatRepository extends BaseRepository<IChat> {
@@ -26,7 +27,7 @@ export class ChatRepository extends BaseRepository<IChat> {
       chat = await Chats.findById(chat._id)
         .populate("participants", "name email status lastSeen")
         .exec();
-      
+
       if (!chat) {
         throw new Error("Failed to create chat");
       }
@@ -42,5 +43,10 @@ export class ChatRepository extends BaseRepository<IChat> {
       .populate("participants", "name email status lastSeen")
       .sort({ updatedAt: -1 })
       .exec();
+  }
+
+  async deleteChatById(chatId: string): Promise<IChat | null> {
+    const result = await Chats.findByIdAndDelete(chatId).exec();
+    return result;
   }
 }

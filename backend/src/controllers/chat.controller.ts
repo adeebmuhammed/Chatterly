@@ -3,7 +3,8 @@ import { IChatController } from "./interfaces/IChatController";
 import { Request, Response } from "express";
 import { TYPES } from "../config/types";
 import { IChatService } from "../services/interfaces/IChatService";
-import { sendSuccess } from "../utils/response.helper";
+import { sendError, sendSuccess } from "../utils/response.helper";
+import { STATUS_CODES } from "../utils/constants";
 
 @injectable()
 export class ChatController implements IChatController {
@@ -15,9 +16,13 @@ export class ChatController implements IChatController {
 
       const { userChats } = await this._chatService.getUserChats(userId);
 
-      res.status(200).json(sendSuccess("Chats fetched successfully", userChats));
+      res
+        .status(STATUS_CODES.OK)
+        .json(sendSuccess("Chats fetched successfully", userChats));
     } catch (error) {
-      res.status(500).json({ message: "Error fetching chats", error });
+      res
+        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json(sendError("Failed to fetch chats", error));
     }
   };
 
@@ -30,11 +35,11 @@ export class ChatController implements IChatController {
 
       const io = req.app.get("io");
 
-  // Notify the other user
-  io.to(otherUserId).emit("newChat", findOrCreateChatResponse);
+      // Notify the other user
+      io.to(otherUserId).emit("newChat", findOrCreateChatResponse);
 
       res
-        .status(200)
+        .status(STATUS_CODES.OK)
         .json(
           sendSuccess(
             "Conversation found or created successfully",
@@ -42,7 +47,9 @@ export class ChatController implements IChatController {
           )
         );
     } catch (error) {
-      res.status(500).json({ message: "Error finding conversation", error });
+      res
+        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json(sendError("Failed to find or create chat", error));
     }
   };
 }

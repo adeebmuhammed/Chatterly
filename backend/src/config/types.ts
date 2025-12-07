@@ -12,6 +12,9 @@ const TYPES = {
   IMessageRepository: Symbol.for("IMessageRepository"),
   IMessageService: Symbol.for("IMessageService"),
   IMessageController: Symbol.for("IMessageController"),
+
+  IGroupController: Symbol.for("IGroupController"),
+  IGroupService: Symbol.for("IGroupService"),
 };
 
 export { TYPES };

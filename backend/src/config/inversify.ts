@@ -20,6 +20,10 @@ import { IMessageService } from "../services/interfaces/IMessageService";
 import { MessageService } from "../services/message.service";
 import { MessageController } from "../controllers/message.controller";
 import { IMessageController } from "../controllers/interfaces/IMessageController";
+import { IGroupController } from "../controllers/interfaces/IGroupController";
+import { GroupController } from "../controllers/group.controller";
+import { IGroupService } from "../services/interfaces/IGroupService";
+import { GroupService } from "../services/group.service";
 
 const container = new Container();
 
@@ -36,5 +40,8 @@ container.bind<IChatRepository>(TYPES.IChatRepository).to(ChatRepository);
 container.bind<IMessageService>(TYPES.IMessageService).to(MessageService); 
 container.bind<IMessageController>(TYPES.IMessageController).to(MessageController);
 container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepository);
+
+container.bind<IGroupController>(TYPES.IGroupController).to(GroupController);
+container.bind<IGroupService>(TYPES.IGroupService).to(GroupService);
 
 export { container };

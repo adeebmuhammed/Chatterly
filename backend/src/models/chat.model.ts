@@ -5,6 +5,7 @@ export interface IChat extends Document {
   participants: mongoose.Types.ObjectId[];
   isGroup: boolean;
   groupName?: string;
+  createdBy?: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,11 +16,25 @@ const ChatSchema: Schema = new Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Users",
-        required: true
-      }
+        required: true,
+      },
     ],
     isGroup: { type: Boolean, default: false },
-    groupName: { type: String, default: null },
+
+    groupName: {
+      type: String,
+      required: function () {
+        return this.isGroup;
+      },
+    },
+
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: function () {
+        return this.isGroup;
+      },
+    },
   },
   { timestamps: true }
 );
