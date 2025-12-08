@@ -7,9 +7,12 @@ import cors from "cors";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { socketHandler } from "./helpers/socket-io";
+import cookieParser from "cookie-parser";
+
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 connectDB();
 
 app.use(

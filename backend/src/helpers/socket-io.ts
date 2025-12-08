@@ -66,6 +66,26 @@ export const socketHandler = (io: Server) => {
       }
     });
 
+    socket.on("joinGroupEvent", (data) => {
+      const { chatId, user } = data;
+
+      // Notify everyone in the group
+      io.to(chatId).emit("groupJoined", {
+        chatId,
+        user, // {_id, name}
+      });
+    });
+
+    socket.on("leaveGroupEvent", (data) => {
+      const { chatId, userId } = data;
+
+      // Notify everyone in the group
+      io.to(chatId).emit("groupLeft", {
+        chatId,
+        userId,
+      });
+    });
+
     // Disconnect
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);

@@ -12,19 +12,11 @@
 
     <ul *ngIf="!isLoading && searchResults && searchResults.length > 0">
       <li class="dropdown-item" *ngFor="let result of searchResults">
-        
-        <!-- User -->
-        <div *ngIf="searchType === 'user'" (click)="onResultClick(result)">
-          {{ result.name }}
-        </div>
-
-        <!-- Group -->
-        <div *ngIf="searchType === 'group'">
+        <div class="result-row" *ngIf="searchType === 'group'">
           <span (click)="onResultClick(result)" class="group-name">
             {{ result.groupName }}
           </span>
 
-          <!-- If user not in group -->
           <button
             *ngIf="!result.participants.includes(loggedInUserId)"
             class="join-btn"

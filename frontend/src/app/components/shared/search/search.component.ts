@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -12,7 +12,7 @@ import { UserSearchResultResponse } from '../../../interfaces/user.interface';
   templateUrl: './search.component.html',
   styleUrl: './search.component.css',
 })
-export class SearchComponent implements OnChanges {
+export class SearchComponent implements OnChanges, OnInit {
   searchQuery = '';
   isLoading = false;
 
@@ -26,7 +26,11 @@ export class SearchComponent implements OnChanges {
   }>();
   @Output() itemSelected = new EventEmitter<any>();
   @Output() joinGroup = new EventEmitter<any>();
-  loggedInUserId = localStorage.getItem("userId")
+  public loggedInUserId: string | null = '';
+
+  ngOnInit(): void {
+    this.loggedInUserId = localStorage.getItem('userId');
+  }
 
   constructor() {
     this.searchSubject
@@ -50,6 +54,7 @@ export class SearchComponent implements OnChanges {
   onJoinGroup(group: any, event: Event) {
     event.stopPropagation(); // prevent onResultClick
     this.joinGroup.emit(group);
+    this.searchQuery = '';
   }
 
   ngOnChanges() {

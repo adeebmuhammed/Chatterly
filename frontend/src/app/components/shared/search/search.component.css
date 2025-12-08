@@ -51,3 +51,34 @@
 .dropdown-item:hover {
   background: #f5f8ff;
 }
+
+.join-btn {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 8px;
+  background: #4a90e2;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.join-btn:hover {
+  background: #3a7ac5;
+  transform: translateY(-1px);
+}
+
+.join-btn:active {
+  background: #336daa;
+  transform: translateY(0);
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* pushes button to the right */
+  width: 100%;
+}

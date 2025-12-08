@@ -31,4 +31,20 @@ export class SocketService {
   onNewMessageNotification(callback: any) {
     this.socket.on('newMessageNotification', callback);
   }
+
+  onGroupJoined(callback: any) {
+    this.socket.on('groupJoined', callback);
+  }
+
+  onGroupLeft(callback: any) {
+    this.socket.on('groupLeft', callback);
+  }
+
+  emitJoinGroup(chatId: string, user: any) {
+    this.socket.emit('joinGroupEvent', { chatId, user });
+  }
+
+  emitLeaveGroup(chatId: string, userId: string) {
+    this.socket.emit('leaveGroupEvent', { chatId, userId });
+  }
 }
