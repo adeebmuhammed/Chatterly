@@ -61,18 +61,29 @@ export class GroupService implements IGroupService {
 
     if (!chat) throw new Error("Group not found");
 
+    // Check if leaving user is the admin
+    let isAdmin;
+    if (chat.createdBy) {
+      isAdmin = chat.createdBy.toString() === userId;
+    }
+
     chat.participants = chat.participants.filter(
       (id) => id.toString() !== userId
     );
 
+    if (isAdmin && chat.participants.length > 0) {
+      chat.createdBy = chat.participants[0];
+    }
+
     let result;
     if (chat.participants.length === 0) {
       result = await this._chatRepo.deleteChatById(chatId);
-      if (!result) {
-        throw new Error("Failed to delete empty group chat");
-      }
+      if (!result) throw new Error("Failed to delete empty group chat");
+    } else {
+      result = await chat.save();
     }
-    return result ? result : chat;
+
+    return result;
   }
 
   async joinGroup(chatId: string, userId: string): Promise<IChat | null> {

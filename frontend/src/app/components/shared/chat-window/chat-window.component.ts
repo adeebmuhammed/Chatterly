@@ -14,8 +14,12 @@ export class ChatWindowComponent {
   @Input() messages: IMessage[] = [];
   @Input() activeChat: IChat | null = null;
   @Output() sendMessageEmitter = new EventEmitter<string>();
+  @Output() leaveGroupEmitter = new EventEmitter<string>();
 
   messageText = '';
+  menuOpen = false;
+
+  loggedInUserId: string = localStorage.getItem('userId') || '';
 
   send() {
     if (!this.messageText.trim()) return;
@@ -24,7 +28,15 @@ export class ChatWindowComponent {
     this.messageText = '';
   }
 
-  loggedInUserId: string = localStorage.getItem('userId') || '';
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  leaveGroup() {
+    if (!this.activeChat) return;
+    this.leaveGroupEmitter.emit(this.activeChat._id);
+    this.menuOpen = false;
+  }
 
   getOtherParticipantName(chat: any): string {
     return (

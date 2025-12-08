@@ -7,17 +7,32 @@
     (ngModelChange)="onSearchInput($event)"
   />
 
-  <!-- Dropdown -->
   <div class="dropdown" *ngIf="searchQuery">
     <div class="loading" *ngIf="isLoading">Searching...</div>
 
     <ul *ngIf="!isLoading && searchResults && searchResults.length > 0">
-      <li
-        *ngFor="let result of searchResults"
-        class="dropdown-item"
-        (click)="onResultClick(result)"
-      >
-        {{ result.name }}
+      <li class="dropdown-item" *ngFor="let result of searchResults">
+        
+        <!-- User -->
+        <div *ngIf="searchType === 'user'" (click)="onResultClick(result)">
+          {{ result.name }}
+        </div>
+
+        <!-- Group -->
+        <div *ngIf="searchType === 'group'">
+          <span (click)="onResultClick(result)" class="group-name">
+            {{ result.groupName }}
+          </span>
+
+          <!-- If user not in group -->
+          <button
+            *ngIf="!result.participants.includes(loggedInUserId)"
+            class="join-btn"
+            (click)="onJoinGroup(result, $event)"
+          >
+            Join
+          </button>
+        </div>
       </li>
     </ul>
 

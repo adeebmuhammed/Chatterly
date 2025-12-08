@@ -27,7 +27,8 @@ routes.get("/search-users", userController.searchUsers);
 
 routes
   .get("/chat/:userId", chatController.getUserChats)
-  .post("/chat/find-or-create", chatController.findOrCreateChat);
+  .post("/chat/find-or-create", chatController.findOrCreateChat)
+  .get("/group/search", chatController.searchGroupChats);
 
 routes
   .post("/message/send", messageController.sendMessage)

@@ -5,6 +5,7 @@ export interface IChat {
   participants: Participant[];
   isGroup: boolean;
   groupName?: string;
+  createdBy?: Creator;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,4 +21,11 @@ export interface Participant {
 export interface IChatUI extends IChat {
   hasUnread?: boolean;
   lastMessage?: string;
+  lastSender?: string;
+}
+
+interface Creator{
+  _id: string;
+  name: string;
+  email: string;
 }

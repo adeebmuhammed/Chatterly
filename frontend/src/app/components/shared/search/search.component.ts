@@ -18,21 +18,22 @@ export class SearchComponent implements OnChanges {
 
   private searchSubject = new Subject<string>();
 
-  @Input() searchResults: UserSearchResultResponse[] = [];
-  @Output() search = new EventEmitter<string>();
-  @Output() userSelected = new EventEmitter<UserSearchResultResponse>();
-
-  onResultClick(result: UserSearchResultResponse) {
-    this.userSelected.emit(result);
-    this.searchQuery = '';
-  }
+  @Input() searchResults: any[] = [];
+  @Input() searchType: 'user' | 'group' = 'user'; // add type input
+  @Output() search = new EventEmitter<{
+    query: string;
+    type: 'user' | 'group';
+  }>();
+  @Output() itemSelected = new EventEmitter<any>();
+  @Output() joinGroup = new EventEmitter<any>();
+  loggedInUserId = localStorage.getItem("userId")
 
   constructor() {
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged())
       .subscribe((query) => {
         this.isLoading = true;
-        this.search.emit(query);
+        this.search.emit({ query, type: this.searchType });
       });
   }
 
@@ -41,8 +42,17 @@ export class SearchComponent implements OnChanges {
     this.searchSubject.next(value);
   }
 
+  onResultClick(item: any) {
+    this.itemSelected.emit(item);
+    this.searchQuery = '';
+  }
+
+  onJoinGroup(group: any, event: Event) {
+    event.stopPropagation(); // prevent onResultClick
+    this.joinGroup.emit(group);
+  }
+
   ngOnChanges() {
-    // When parent sends new results, stop loading
     this.isLoading = false;
   }
 }

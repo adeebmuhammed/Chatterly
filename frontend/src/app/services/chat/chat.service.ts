@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '../../../environment/environment';
 import { Observable } from 'rxjs';
@@ -51,5 +51,12 @@ export class ChatService {
   // Send a message
   sendMessage(payload: any) {
     return this.http.post(`${this.baseUrl}/message/send`, payload);
+  }
+
+  searchGroupChats(query: string): Observable<ApiResponse<IChat[]>> {
+    const params = new HttpParams().set('q', query);
+    return this.http.get<ApiResponse<IChat[]>>(`${this.baseUrl}/group/search`, {
+      params,
+    });
   }
 }

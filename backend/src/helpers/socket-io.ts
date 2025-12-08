@@ -26,6 +26,7 @@ export const socketHandler = (io: Server) => {
         createdAt: new Date(),
       };
 
+      // Push notification message
       const messageData = {
         title: "New Message",
         body: data.message,
@@ -35,10 +36,26 @@ export const socketHandler = (io: Server) => {
 
       sendPushNotification(messageData);
 
-      // Broadcast to chat room
+      // Broadcast message to room (group chat OR normal chat)
       io.to(data.chatId).emit("receiveMessage", messageToSend);
 
-      // Notify receiver (1-on-1 only)
+      // --- NEW: Group chat notifications ---
+      if (Array.isArray(data.receiverIds)) {
+        data.receiverIds
+          .filter((id: string) => id !== data.senderId) // don't notify self
+          .forEach((userId: string) => {
+            io.to(userId).emit("newMessageNotification", {
+              chatId: data.chatId,
+              message: data.message,
+              senderId: data.senderId,
+              createdAt: new Date(),
+            });
+          });
+
+        return; // done for group messages
+      }
+
+      // --- Old: 1-on-1 chat fallback ---
       if (data.receiverId) {
         io.to(data.receiverId).emit("newMessageNotification", {
           chatId: data.chatId,

@@ -49,4 +49,14 @@ export class ChatRepository extends BaseRepository<IChat> {
     const result = await Chats.findByIdAndDelete(chatId).exec();
     return result;
   }
+
+  async searchGroupChats(query: string): Promise<IChat[]  | []> {
+    const groups = await Chats.find({
+      isGroup: true,
+      groupName: { $regex: query, $options: "i" },
+    })
+      .populate("createdBy", "name email")
+      .exec();
+    return groups;
+  }
 }

@@ -137,10 +137,10 @@ export class UserController implements IUserController {
           .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
           .json(sendError("Users Not Found"));
       } else {
-        res.status(200).json(sendSuccess("Users fetched successfully", users));
+        res.status(STATUS_CODES.OK).json(sendSuccess("Users fetched successfully", users));
       }
     } catch (error) {
-      res.status(500).json({ message: "Error searching users", error });
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(sendError("Error Searching Users"));
     }
   };
 }

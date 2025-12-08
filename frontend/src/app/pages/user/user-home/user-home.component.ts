@@ -65,8 +65,11 @@ export class UserHomeComponent implements OnInit {
       }
     });
 
-    this.socketService.onNewMessageNotification((data: IMessage) => {
-      // If the user is not inside the chat → mark as unread
+    this.socketService.onNewMessageNotification((data: any) => {
+      // Don't show unread on sender's own device
+      if (data.senderId === this.loggedInUserId) return;
+
+      // If message is not for the active chat → mark unread
       if (data.chatId !== this.activeChat?._id) {
         this.markChatAsUnread(data.chatId, data);
       }
@@ -94,15 +97,24 @@ export class UserHomeComponent implements OnInit {
       .createGroup(this.loggedInUserId, data.groupName, data.users)
       .subscribe({
         next: (res: ApiResponse<IChat>) => {
-          Swal.fire("Success", res.message || "Group Chat Created Successfully", "success")
+          Swal.fire(
+            'Success',
+            res.message || 'Group Chat Created Successfully',
+            'success'
+          );
           if (res.data) {
             this.chats.unshift(res.data);
             this.onChatSelected(res.data);
           }
         },
         error: (err) => {
-          Swal.fire("Error", err.message || "Group Chat Creation Failed", "error")
-          console.error(err)},
+          Swal.fire(
+            'Error',
+            err.message || 'Group Chat Creation Failed',
+            'error'
+          );
+          console.error(err);
+        },
       });
 
     this.showGroupModal = false;
@@ -118,7 +130,6 @@ export class UserHomeComponent implements OnInit {
         .getChats(this.loggedInUserId)
         .subscribe((res: ApiResponse<IChat[]>) => {
           this.chats = res.data || [];
-          console.log(this.chats);
         });
     });
   }
@@ -140,37 +151,66 @@ export class UserHomeComponent implements OnInit {
     this.socketService.sendMessage(payload);
   }
 
-  results: UserSearchResultResponse[] = [];
+  results: UserSearchResultResponse[] | IChat[] = [];
+  searchType: 'user' | 'group' = 'user';
 
-  onSearch(query: string) {
-    this.chatService
-      .searchUsers(query)
-      .subscribe((res: ApiResponse<UserSearchResultResponse[]>) => {
-        this.results = res.data ? res.data : [];
+  onSearch({ query, type }: { query: string; type: 'user' | 'group' }) {
+    if (type === 'user') {
+      this.chatService
+        .searchUsers(query)
+        .subscribe((res: ApiResponse<UserSearchResultResponse[]>) => {
+          this.results = res.data ?? [];
+        });
+    } else {
+      this.chatService.searchGroupChats(query).subscribe({
+        next: (res: ApiResponse<IChat[]>) => {
+          this.results = res.data ?? [];
+        },
+        error: (err) => {
+          console.log(err);
+        },
       });
+    }
   }
 
-  onUserSelected(user: UserSearchResultResponse) {
-    const payload = {
-      userId: this.loggedInUserId,
-      otherUserId: user.id,
-    };
-
-    this.chatService.findOrCreateChat(payload).subscribe({
-      next: (res: ApiResponse<IChat>) => {
-        const chat = res.data;
-        if (!chat) return;
-        const existingChat = this.chats.find((c) => c._id === chat._id);
-        if (!existingChat) {
-          this.chats.unshift(chat);
-        }
-        this.openChat(chat);
-      },
-      error: (err) => {
-        console.error('Error finding or creating chat:', err);
-      },
-    });
+  onResultSelected(item: any) {
+  if (item.type === 'user') {
+    this.handleUserSelection(item);
+  } else if (item.type === 'group') {
+    this.handleGroupSelection(item);
   }
+}
+
+handleUserSelection(user: any) {
+  const payload = {
+    userId: this.loggedInUserId,
+    otherUserId: user.id,
+  };
+
+  this.chatService.findOrCreateChat(payload).subscribe({
+    next: (res: ApiResponse<IChat>) => {
+      const chat = res.data;
+      if (!chat) return;
+
+      const existingChat = this.chats.find((c) => c._id === chat._id);
+      if (!existingChat) this.chats.unshift(chat);
+
+      this.openChat(chat);
+    },
+    error: (err) => console.error('Error finding or creating chat:', err),
+  });
+}
+
+handleGroupSelection(group: any) {
+  const isMember = group.participants?.includes(this.loggedInUserId);
+
+  if (isMember) {
+    // Already in group → open directly
+    this.openChat(group);
+    return;
+  }
+}
+
 
   openChat(chat: IChat) {
     this.activeChat = chat;
@@ -187,20 +227,58 @@ export class UserHomeComponent implements OnInit {
       });
   }
 
+  onJoinGroup(group: IChat) {
+    this.groupService.joinGroup(this.loggedInUserId, group._id).subscribe({
+      next: (res: ApiResponse<IChat>) => {
+        const chat = res.data;
+        if (chat) {
+          this.openChat(chat);
+        }
+      },
+      error: (err) => console.error('Join group failed:', err),
+    });
+  }
+
   getOtherUserId(chat: IChat) {
     if (!chat || !chat.participants) return;
     return chat.participants.find((p) => p._id !== this.loggedInUserId)?._id;
   }
 
-  markChatAsUnread(chatId: string, message: any) {
+  markChatAsUnread(chatId: string, data: any) {
     const chat = this.chats.find((c) => c._id === chatId);
     if (!chat) return;
 
-    (chat as IChatUI).hasUnread = true;
-    (chat as IChatUI).lastMessage = message.message;
-    chat.updatedAt = new Date(); // move chat up
+    const uiChat = chat as IChatUI;
 
-    // Move chat to top of list just like WhatsApp
+    uiChat.hasUnread = true;
+    uiChat.lastMessage = data.message;
+    uiChat.lastSender = data.senderId; // optional if you want "John: hello"
+
+    chat.updatedAt = new Date();
+
+    // Move chat to top
     this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
+  }
+
+  onLeaveGroup(chatId: string) {
+    this.groupService.leaveGroup(this.loggedInUserId, chatId).subscribe({
+      next: (res: ApiResponse<IChat>) => {
+        Swal.fire(
+          'Left Group',
+          res.message || 'You left the group successfully',
+          'success'
+        );
+
+        // remove chat from list
+        this.chats = this.chats.filter((c) => c._id !== chatId);
+
+        // close chat window
+        this.activeChat = null;
+        this.messages = [];
+      },
+      error: (err) => {
+        Swal.fire('Error', err.message || 'Failed to leave group', 'error');
+      },
+    });
   }
 }

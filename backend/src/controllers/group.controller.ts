@@ -16,7 +16,7 @@ export class GroupController implements IGroupController {
     try {
       const { creatorId, userIds, groupName } = req.body;
 
-      const group = await this._groupService.createGroup(
+      const { group } = await this._groupService.createGroup(
         creatorId,
         userIds,
         groupName
@@ -28,7 +28,13 @@ export class GroupController implements IGroupController {
     } catch (error) {
       res
         .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .json(sendError(error instanceof Error? error.message : "failed to create group chat"));
+        .json(
+          sendError(
+            error instanceof Error
+              ? error.message
+              : "failed to create group chat"
+          )
+        );
     }
   }
 
@@ -44,7 +50,13 @@ export class GroupController implements IGroupController {
     } catch (error) {
       res
         .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .json(sendError("Failed to join group", error));
+        .json(
+          sendError(
+            error instanceof Error
+              ? error.message
+              : "failed to join group chat"
+          )
+        );
     }
   }
 
@@ -60,7 +72,13 @@ export class GroupController implements IGroupController {
     } catch (error) {
       res
         .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .json(sendError("Failed to leave group", error));
+        .json(
+          sendError(
+            error instanceof Error
+              ? error.message
+              : "failed to leave group chat"
+          )
+        );
     }
   }
 }

@@ -2,12 +2,19 @@
 
 <!-- Search Bar Wrapper -->
 <div class="top-search-bar">
+  <div class="search-toggle">
+  <button (click)="searchType = 'user'" [class.active]="searchType === 'user'">Users</button>
+  <button (click)="searchType = 'group'" [class.active]="searchType === 'group'">Groups</button>
+</div>
+
   <app-search
-    [searchResults]="results"
-    (search)="onSearch($event)"
-    (userSelected)="onUserSelected($event)"
-  >
-  </app-search>
+  [searchResults]="results"
+  [searchType]="searchType"
+  (search)="onSearch($event)"
+  (itemSelected)="onResultSelected($event)"
+  (joinGroup)="onJoinGroup($event)"
+></app-search>
+
 </div>
 
 <div class="chat-container">
@@ -31,8 +38,8 @@
         [messages]="messages"
         [activeChat]="activeChat"
         (sendMessageEmitter)="onSendMessage($event)"
-      >
-      </app-chat-window>
+        (leaveGroupEmitter)="onLeaveGroup($event)"
+      ></app-chat-window>
     </ng-container>
 
     <ng-template #noChat>

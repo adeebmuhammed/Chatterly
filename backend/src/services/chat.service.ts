@@ -35,4 +35,9 @@ export class ChatService implements IChatService {
 
     return { findOrCreateChatResponse };
   };
+
+  searchGroupChats = async (query: string): Promise<IChat[]> => {
+    const groups = await this._chatRepo.searchGroupChats(query);
+    return groups;
+  };
 }
