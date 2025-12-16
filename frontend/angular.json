@@ -23,7 +23,7 @@
               "src/assets",
               {
                 "glob": "custom-sw.js",
-                "input": "public",
+                "input": "src",
                 "output": "/"
               },
               {

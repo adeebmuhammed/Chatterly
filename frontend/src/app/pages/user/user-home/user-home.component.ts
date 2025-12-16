@@ -75,7 +75,7 @@ export class UserHomeComponent implements OnInit {
       }
     });
 
-    this.notificationService.subscribeToNotifications();
+    this.notificationService.subscribeToPush();
   }
 
   openCreateGroupModal() {

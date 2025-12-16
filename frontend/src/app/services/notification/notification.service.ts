@@ -7,18 +7,32 @@ import { environment } from '../../../environment/environment';
   providedIn: 'root'
 })
 export class NotificationService {
+  constructor(private http: HttpClient) {}
 
-  constructor(private sw: SwPush, private http: HttpClient) {}
+  subscribeToPush() {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: this.urlBase64ToUint8Array(environment.VAPID_PUBLIC_KEY)
+        })
+        .then(sub => {
+          console.log('Push subscription:', sub);
+          this.http.post(`${environment.apiBaseUrl}/notifications/subscribe`, sub).subscribe();
+        })
+        .catch(err => console.error('Push subscription failed', err));
+      });
+    } else {
+      console.warn('Service workers are not supported in this browser.');
+    }
+  }
 
-  VAPID_PUBLIC_KEY = `${environment.VAPID_PUBLIC_KEY}`;
-
-  subscribeToNotifications() {
-    this.sw.requestSubscription({
-      serverPublicKey: this.VAPID_PUBLIC_KEY,
-    })
-      .then((sub) => {
-        this.http.post(`${environment.apiBaseUrl}/notifications/subscribe`, sub).subscribe();
-      })
-      .catch((err) => console.error('Could not subscribe', err));
+  private urlBase64ToUint8Array(base64String: string) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64 = (base64String + padding)
+      .replace(/\-/g, '+')
+      .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from([...rawData].map(char => char.charCodeAt(0)));
   }
 }

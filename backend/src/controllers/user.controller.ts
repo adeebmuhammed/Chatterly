@@ -18,22 +18,21 @@ export class UserController implements IUserController {
       const { loginResponse } = await this._userService.login(email, password);
       const refreshToken = generateRefreshToken({ userId: loginResponse.id });
 
-      res.cookie("auth-token", loginResponse.token, {
-        httpOnly: process.env.AUTH_TOKEN_HTTP_ONLY === "true",
-        secure: process.env.AUTH_TOKEN_SECURE === "true",
-        sameSite: process.env.AUTH_TOKEN_SAME_SITE as "lax" | "strict" | "none",
-        maxAge: Number(process.env.AUTH_TOKEN_MAX_AGE),
-      });
+     res.cookie("auth-token", loginResponse.token, {
+  httpOnly: true,
+  secure: true,      // REQUIRED
+  sameSite: "none",  // REQUIRED
+  path: "/",
+});
 
-      res.cookie("refresh-token", refreshToken, {
-        httpOnly: process.env.REFRESH_TOKEN_HTTP_ONLY === "true",
-        secure: process.env.REFRESH_TOKEN_SECURE === "true",
-        sameSite: process.env.REFRESH_TOKEN_SAME_SITE as
-          | "lax"
-          | "strict"
-          | "none",
-        maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
-      });
+res.cookie("refresh-token", refreshToken, {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  path: "/",
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+});
+
 
       res
         .status(STATUS_CODES.OK)
