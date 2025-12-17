@@ -15,7 +15,16 @@
         </ng-template>
       </div>
 
-      <div class="last-msg">No messages yet</div>
+      <div class="last-msg">
+  <ng-container *ngIf="chat.isGroup && chat.lastMessageSender">
+    <strong>
+      {{ chat.lastMessageSender === loggedInUserId ? 'You' : chat.lastMessageSender }}:
+    </strong>
+  </ng-container>
+
+  {{ chat.lastMessage || 'No messages yet' }}
+</div>
+
     </div>
 
     <div class="chat-meta">

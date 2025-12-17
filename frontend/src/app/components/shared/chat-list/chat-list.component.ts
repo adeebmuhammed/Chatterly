@@ -19,7 +19,7 @@ export class ChatListComponent {
     this.selectChatEmitter.emit(chat);
   }
 
-  private loggedInUserId: string = localStorage.getItem('userId') || '';
+  protected loggedInUserId: string = localStorage.getItem('userId') || '';
 
   getOtherParticipantName(chat: any): string {
     return (

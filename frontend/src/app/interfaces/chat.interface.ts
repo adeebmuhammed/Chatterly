@@ -6,6 +6,9 @@ export interface IChat {
   isGroup: boolean;
   groupName?: string;
   createdBy?: Creator;
+   lastMessage?: string | null;
+  lastMessageSender?: string | null;
+  lastMessageAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,8 +23,6 @@ export interface Participant {
 
 export interface IChatUI extends IChat {
   hasUnread?: boolean;
-  lastMessage?: string;
-  lastSender?: string;
 }
 
 interface Creator{

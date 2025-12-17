@@ -245,20 +245,17 @@ handleGroupSelection(group: any) {
   }
 
   markChatAsUnread(chatId: string, data: any) {
-    const chat = this.chats.find((c) => c._id === chatId);
-    if (!chat) return;
+  const chat = this.chats.find((c) => c._id === chatId);
+  if (!chat) return;
 
-    const uiChat = chat as IChatUI;
+  chat.hasUnread = true;
+  chat.lastMessage = data.message;
+  chat.lastMessageSender = data.senderId;
+  chat.updatedAt = new Date();
 
-    uiChat.hasUnread = true;
-    uiChat.lastMessage = data.message;
-    uiChat.lastSender = data.senderId; // optional if you want "John: hello"
+  this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
+}
 
-    chat.updatedAt = new Date();
-
-    // Move chat to top
-    this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
-  }
 
   onLeaveGroup(chatId: string) {
     this.groupService.leaveGroup(this.loggedInUserId, chatId).subscribe({
