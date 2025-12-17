@@ -47,3 +47,14 @@ export const REGEX = {
   OTP: /^\d{6}$/,
   PHONE: /^[0-9]{10,15}$/,
 };
+
+export enum USER_ACTIVE_STATUS {
+  ONLINE = "online",
+  OFFLINE = "offline",
+}
+
+export enum FILE_TYPES {
+  TEXT = "text",
+  IMAGE = "image",
+  FILE = "file",
+}

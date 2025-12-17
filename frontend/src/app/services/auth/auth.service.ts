@@ -3,7 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { ApiResponse } from '../../interfaces/common-interface';
 import { environment } from '../../../environment/environment';
-import { resendOtpInterface } from '../../interfaces/user.interface';
+import {
+  resendOtpInterface,
+  UserLoginResponse,
+} from '../../interfaces/user.interface';
 
 @Injectable({
   providedIn: 'root',
@@ -63,52 +66,77 @@ export class AuthService {
     );
   }
 
-    userVerifyOtp(data: { email: string; otp: string; }): Observable<{ message: string; user: { name: string; email: string } }> {
-    return new Observable(observer => {
-      this.http.post<{ message: string; user: { name: string; email: string } }>(`${environment.apiBaseUrl}/verify-otp`, data).subscribe({
-        next: (res) => {
-          observer.next(res);
-          observer.complete();
-        },
-        error: err => observer.error(err)
-      });
+  userVerifyOtp(data: {
+    email: string;
+    otp: string;
+  }): Observable<{ message: string; user: { name: string; email: string } }> {
+    return new Observable((observer) => {
+      this.http
+        .post<{ message: string; user: { name: string; email: string } }>(
+          `${environment.apiBaseUrl}/verify-otp`,
+          data
+        )
+        .subscribe({
+          next: (res) => {
+            observer.next(res);
+            observer.complete();
+          },
+          error: (err) => observer.error(err),
+        });
     });
   }
 
-    userResendOtp(data: { email: string; }): Observable< ApiResponse<resendOtpInterface>> {
-    return this.http.post< ApiResponse<resendOtpInterface> >(`${environment.apiBaseUrl}/resend-otp`, data);
+  userResendOtp(data: {
+    email: string;
+  }): Observable<ApiResponse<resendOtpInterface>> {
+    return this.http.post<ApiResponse<resendOtpInterface>>(
+      `${environment.apiBaseUrl}/resend-otp`,
+      data
+    );
   }
 
-    userSignin(data: { email: string; password: string }): Observable<ApiResponse<null>> {
-    return new Observable(observer => {
-      this.http.post<ApiResponse<null>>(`${environment.apiBaseUrl}/login`, data).subscribe({
-        next: (res: any) => {
-          localStorage.setItem('role',"user");
-          localStorage.setItem('token',res?.user?.token)
-          const name = res.user?.name || '';
-          const userId = res.user?.id || '';
+  userSignin(data: {
+    email: string;
+    password: string;
+  }): Observable<ApiResponse<UserLoginResponse>> {
+    return new Observable((observer) => {
+      this.http
+        .post<ApiResponse<UserLoginResponse>>(
+          `${environment.apiBaseUrl}/login`,
+          data
+        )
+        .subscribe({
+          next: (res: ApiResponse<UserLoginResponse>) => {
+            localStorage.setItem('role', 'user');
+            localStorage.setItem('token', res?.data?.token || '');
+            const name = res.data?.name || '';
+            const userId = res.data?.id || '';
+            localStorage.setItem('userName', name);
+            localStorage.setItem('userId', userId);
 
-          this.updateLoginState("user", true, name, userId);
+            this.updateLoginState('user', true, name, userId);
 
-          observer.next(res); // pass to component
-          observer.complete();
-        },
-        error: err => observer.error(err)
-      });
+            observer.next(res); // pass to component
+            observer.complete();
+          },
+          error: (err) => observer.error(err),
+        });
     });
   }
 
   userLogout(): Observable<ApiResponse<null>> {
-    return new Observable(observer => {
-      this.http.post<ApiResponse<null>>(`${environment.apiBaseUrl}/logout`, {}).subscribe({
-        next: res => {
-          localStorage.clear();
-          this.updateLoginState("user", false, null, null);
-          observer.next(res);
-          observer.complete();
-        },
-        error: err => observer.error(err)
-      });
+    return new Observable((observer) => {
+      this.http
+        .post<ApiResponse<null>>(`${environment.apiBaseUrl}/logout`, {})
+        .subscribe({
+          next: (res) => {
+            localStorage.clear();
+            this.updateLoginState('user', false, null, null);
+            observer.next(res);
+            observer.complete();
+          },
+          error: (err) => observer.error(err),
+        });
     });
   }
 }

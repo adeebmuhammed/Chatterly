@@ -1,0 +1,73 @@
+<div class="chat-window">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="left">
+      <img class="avatar" src="user.png" />
+
+      <div class="info">
+        <!-- Group Chat -->
+        <ng-container *ngIf="activeChat?.isGroup; else privateChat">
+          <div class="name">{{ activeChat?.groupName || "Unnamed Group" }}</div>
+          <div class="sub">
+            {{ activeChat?.participants?.length }} participants
+          </div>
+        </ng-container>
+
+        <!-- Private Chat -->
+        <ng-template #privateChat>
+          <div class="name">{{ getOtherParticipantName(activeChat) }}</div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- Right - Menu -->
+    <div class="menu-wrapper">
+      <button class="menu-btn" (click)="toggleMenu()">
+        ⋮
+      </button>
+
+      <div *ngIf="menuOpen" class="menu">
+        <!-- Visible only for groups -->
+        <button *ngIf="activeChat?.isGroup" (click)="leaveGroup()">
+          Leave Group
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="messages" id="messageArea">
+    <div
+      class="message"
+      *ngFor="let msg of messages"
+      [ngClass]="{
+        sent: msg.sender._id === loggedInUserId,
+        received: msg.sender._id !== loggedInUserId
+      }"
+    >
+      <!-- Show sender name for group messages (except for self) -->
+      <div
+        class="sender-label"
+        *ngIf="activeChat?.isGroup && msg.sender._id !== loggedInUserId"
+      >
+        {{ msg.sender.name }}
+      </div>
+
+      <div class="bubble">{{ msg.message }}</div>
+
+      <span class="time">{{ msg.createdAt | date : "shortTime" }}</span>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input
+      type="text"
+      [(ngModel)]="messageText"
+      placeholder="Type a message..."
+      (keyup.enter)="send()"
+    />
+
+    <button (click)="send()">Send</button>
+  </div>
+</div>

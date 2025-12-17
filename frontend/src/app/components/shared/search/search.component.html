@@ -1,0 +1,35 @@
+<div class="search-wrapper">
+  <input
+    type="text"
+    placeholder="Search..."
+    class="search-input"
+    [(ngModel)]="searchQuery"
+    (ngModelChange)="onSearchInput($event)"
+  />
+
+  <div class="dropdown" *ngIf="searchQuery">
+    <div class="loading" *ngIf="isLoading">Searching...</div>
+
+    <ul *ngIf="!isLoading && searchResults && searchResults.length > 0">
+      <li class="dropdown-item" *ngFor="let result of searchResults">
+        <div class="result-row" *ngIf="searchType === 'group'">
+          <span (click)="onResultClick(result)" class="group-name">
+            {{ result.groupName }}
+          </span>
+
+          <button
+            *ngIf="!result.participants.includes(loggedInUserId)"
+            class="join-btn"
+            (click)="onJoinGroup(result, $event)"
+          >
+            Join
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <div class="no-results" *ngIf="!isLoading && searchResults.length === 0">
+      No results found
+    </div>
+  </div>
+</div>

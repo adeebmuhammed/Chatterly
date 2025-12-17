@@ -1,7 +1,11 @@
 import bcrypt from "bcrypt";
 import { inject, injectable } from "inversify";
 import { MessageResponseDto } from "../dto/base.dto";
-import { UserRegisterRequestDto } from "../dto/user.dto";
+import {
+  UserLoginResponseDto,
+  UserRegisterRequestDto,
+  UserSearchResultDto,
+} from "../dto/user.dto";
 import { IUserService } from "./interfaces/IUserService";
 import { TYPES } from "../config/types";
 import { IUserRepository } from "../repositories/interfaces/IUserRepository";
@@ -16,6 +20,9 @@ import { IOtpRepository } from "../repositories/interfaces/IOtpRepository";
 import otpHelper from "../utils/otp.helper";
 import mongoose from "mongoose";
 import { BaseMapper } from "../mappers/base.mapper";
+import { IUser } from "../models/user.model";
+import { UserMapper } from "../mappers/user.mapper";
+import { generateAccessToken } from "../utils/jwt.generator";
 
 @injectable()
 export class UserService implements IUserService {
@@ -27,7 +34,7 @@ export class UserService implements IUserService {
   login = async (
     email: string,
     password: string
-  ): Promise<{ loginResponse: MessageResponseDto }> => {
+  ): Promise<{ loginResponse: UserLoginResponseDto }> => {
     if (!isValidEmail(email)) {
       throw new Error("Invalid email format");
     }
@@ -51,9 +58,12 @@ export class UserService implements IUserService {
       throw new Error(MESSAGES.ERROR.INVALID_CREDENTIALS);
     }
 
-    const loginResponse: MessageResponseDto = BaseMapper.toMessageResponse(
-      MESSAGES.SUCCESS.LOGIN
-    );
+    const accessToken = generateAccessToken({
+      userId: user._id.toString(),
+    });
+
+    const loginResponse: UserLoginResponseDto =
+      UserMapper.toUserLoginResponseDto(user, accessToken);
 
     return {
       loginResponse,
@@ -124,7 +134,9 @@ export class UserService implements IUserService {
     email: string,
     otp: string
   ): Promise<{
-    verifyOTPResponse: MessageResponseDto & { user: { name: string; id: string } };
+    verifyOTPResponse: MessageResponseDto & {
+      user: { name: string; id: string };
+    };
   }> => {
     if (!isValidOTP(otp)) {
       throw new Error("OTP must be a 6-digit number");
@@ -160,7 +172,9 @@ export class UserService implements IUserService {
   resendOTP = async (
     email: string
   ): Promise<{
-    resendOTPResponse: MessageResponseDto & { user: { name: string; email: string } };
+    resendOTPResponse: MessageResponseDto & {
+      user: { name: string; email: string };
+    };
   }> => {
     const user = await this._userRepo.findByEmail(email);
     if (!user) {
@@ -201,5 +215,21 @@ export class UserService implements IUserService {
         },
       },
     };
+  };
+
+  searchUsers = async (
+    query: string
+  ): Promise<{ users: UserSearchResultDto[] }> => {
+    const users = await this._userRepo.find({
+      $or: [
+        { name: { $regex: query, $options: "i" } },
+        { email: { $regex: query, $options: "i" } },
+      ],
+    });
+    if (!users) {
+      throw new Error("No users found");
+    }
+
+    return { users: UserMapper.toUserSearchResultDtoList(users) };
   };
 }

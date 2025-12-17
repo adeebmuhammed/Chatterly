@@ -6,4 +6,6 @@ export interface IUserController {
   verifyOTP(req: Request, res: Response): Promise<void>;
   resendOTP(req: Request, res: Response): Promise<void>;
   logout(req: Request, res: Response): Promise<void>;
+
+  searchUsers(req: Request, res: Response): Promise<void>;
 }

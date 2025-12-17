@@ -1,14 +1,56 @@
 <app-user-header></app-user-header>
 
-<div class="home-wrapper">
-  <div class="home-card">
-    <h1 class="title">🚧 Under Development</h1>
+<!-- Search Bar Wrapper -->
+<div class="top-search-bar">
+  <div class="search-toggle">
+  <button (click)="searchType = 'user'" [class.active]="searchType === 'user'">Users</button>
+  <button (click)="searchType = 'group'" [class.active]="searchType === 'group'">Groups</button>
+</div>
 
-    <p class="subtext">
-      We're working hard to bring you something amazing.  
-      Some features are still being built.
-    </p>
+  <app-search
+  [searchResults]="results"
+  [searchType]="searchType"
+  (search)="onSearch($event)"
+  (itemSelected)="onResultSelected($event)"
+  (joinGroup)="onJoinGroup($event)"
+></app-search>
 
-    <button class="notify-btn">Notify Me When Ready</button>
+</div>
+
+<div class="chat-container">
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <!-- Create Group Button -->
+    <div class="create-group-btn-wrapper">
+      <button class="create-group-btn" (click)="openCreateGroupModal()">
+        ➕ Create Group
+      </button>
+    </div>
+
+    <app-chat-list [chats]="chats" (selectChatEmitter)="onChatSelected($event)">
+    </app-chat-list>
   </div>
+
+  <!-- Right: Chat Window -->
+  <div class="right-panel">
+    <ng-container *ngIf="activeChat; else noChat">
+      <app-chat-window
+        [messages]="messages"
+        [activeChat]="activeChat"
+        (sendMessageEmitter)="onSendMessage($event)"
+        (leaveGroupEmitter)="onLeaveGroup($event)"
+      ></app-chat-window>
+    </ng-container>
+
+    <ng-template #noChat>
+      <div class="no-chat-selected">Select a chat to start messaging</div>
+    </ng-template>
+  </div>
+
+  <app-create-group
+    [visible]="showGroupModal"
+    [allUsers]="allUsersList"
+    (closeModal)="closeGroupModal()"
+    (createGroup)="onCreateGroup($event)"
+  ></app-create-group>
 </div>

@@ -5,6 +5,7 @@ import { TYPES } from "../config/types";
 import { IUserService } from "../services/interfaces/IUserService";
 import { sendError, sendSuccess } from "../utils/response.helper";
 import { STATUS_CODES } from "../utils/constants";
+import { generateRefreshToken } from "../utils/jwt.generator";
 
 @injectable()
 export class UserController implements IUserController {
@@ -15,8 +16,27 @@ export class UserController implements IUserController {
       const { email, password } = req.body;
 
       const { loginResponse } = await this._userService.login(email, password);
+      const refreshToken = generateRefreshToken({ userId: loginResponse.id });
 
-      res.status(STATUS_CODES.OK).json(sendSuccess(loginResponse.message));
+     res.cookie("auth-token", loginResponse.token, {
+  httpOnly: true,
+  secure: true,      // REQUIRED
+  sameSite: "none",  // REQUIRED
+  path: "/",
+});
+
+res.cookie("refresh-token", refreshToken, {
+  httpOnly: true,
+  secure: false,
+  sameSite: "lax",
+  path: "/",
+  maxAge: 1000 * 60 * 60 * 24 * 7,
+});
+
+
+      res
+        .status(STATUS_CODES.OK)
+        .json(sendSuccess(loginResponse.message, loginResponse));
     } catch (error) {
       res
         .status(500)
@@ -103,5 +123,23 @@ export class UserController implements IUserController {
     res.clearCookie("refresh-token", { path: "/" });
 
     res.status(STATUS_CODES.OK).json(sendSuccess("logged out successfully"));
+  };
+
+  searchUsers = async (req: Request, res: Response) => {
+    try {
+      const query = req.query.q as string;
+
+      const { users } = await this._userService.searchUsers(query);
+
+      if (users.length < 1) {
+        res
+          .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+          .json(sendError("Users Not Found"));
+      } else {
+        res.status(STATUS_CODES.OK).json(sendSuccess("Users fetched successfully", users));
+      }
+    } catch (error) {
+      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(sendError("Error Searching Users"));
+    }
   };
 }
