@@ -28,17 +28,30 @@ routes
 routes.get("/search-users", userAuth, userController.searchUsers);
 
 routes
-  .get("/chat/:userId", userAuth,chatController.getUserChats)
-  .post("/chat/find-or-create", userAuth,chatController.findOrCreateChat)
-  .get("/group/search", userAuth,chatController.searchGroupChats);
+  .get("/chat/:userId", userAuth, chatController.getUserChats)
+  .post("/chat/find-or-create", userAuth, chatController.findOrCreateChat)
+  .get("/group/search", userAuth, chatController.searchGroupChats);
 
 routes
-  .post("/message/send", userAuth,messageController.sendMessage)
-  .get("/message/:chatId", userAuth,messageController.getMessages);
+  .post("/message/send", userAuth, messageController.sendMessage)
+  .get("/message/:chatId", userAuth, messageController.getMessages)
+  .delete("/message/:messageId", userAuth, messageController.deleteMessage);
 
-routes.post("/group/create", userAuth,groupController.createGroup.bind(groupController));
-routes.patch("/group/join", userAuth,groupController.joinGroup.bind(groupController));
-routes.patch("/group/leave", userAuth,groupController.leaveGroup.bind(groupController));
+routes.post(
+  "/group/create",
+  userAuth,
+  groupController.createGroup.bind(groupController)
+);
+routes.patch(
+  "/group/join",
+  userAuth,
+  groupController.joinGroup.bind(groupController)
+);
+routes.patch(
+  "/group/leave",
+  userAuth,
+  groupController.leaveGroup.bind(groupController)
+);
 
 routes.post("/notifications/subscribe", saveSubscription);
 

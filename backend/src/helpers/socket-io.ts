@@ -105,6 +105,39 @@ export const socketHandler = (io: Server) => {
       });
     });
 
+    // User started typing
+    socket.on("typing:start", (data) => {
+      const { chatId, userId } = data;
+
+      // Notify others in the chat room
+      socket.to(chatId).emit("userTyping", {
+        chatId,
+        userId,
+        isTyping: true,
+      });
+    });
+
+    // User stopped typing
+    socket.on("typing:stop", (data) => {
+      const { chatId, userId } = data;
+
+      socket.to(chatId).emit("userTyping", {
+        chatId,
+        userId,
+        isTyping: false,
+      });
+    });
+
+    socket.on("deleteMessage", (data) => {
+      const { chatId, messageId } = data;
+
+      // Broadcast to everyone in the chat room
+      io.to(chatId).emit("messageDeleted", {
+        chatId,
+        messageId,
+      });
+    });
+
     // Disconnect
     socket.on("disconnect", async () => {
       const userId = socket.data.userId;

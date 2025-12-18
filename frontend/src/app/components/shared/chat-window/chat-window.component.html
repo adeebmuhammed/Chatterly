@@ -58,7 +58,7 @@
         received: msg.sender._id !== loggedInUserId
       }"
     >
-      <!-- Show sender name for group messages (except for self) -->
+      <!-- Sender name for groups -->
       <div
         class="sender-label"
         *ngIf="activeChat?.isGroup && msg.sender._id !== loggedInUserId"
@@ -66,21 +66,44 @@
         {{ msg.sender.name }}
       </div>
 
-      <div class="bubble">{{ msg.message }}</div>
+      <div class="bubble-wrapper">
+        <div class="bubble">{{ msg.message }}</div>
+
+        <!-- Delete button (only my messages) -->
+        <button
+          class="delete-btn"
+          *ngIf="msg.sender._id === loggedInUserId"
+          (click)="onDeleteMessage(msg._id)"
+        >
+          🗑
+        </button>
+      </div>
 
       <span class="time">{{ msg.createdAt | date : "shortTime" }}</span>
     </div>
   </div>
 
   <!-- Input -->
-  <div class="chat-input">
-    <input
-      type="text"
-      [(ngModel)]="messageText"
-      placeholder="Type a message..."
-      (keyup.enter)="send()"
-    />
+  <div class="chat-input-wrapper">
+    <div class="typing-indicator" *ngIf="typingText">
+      <span class="typing-name">{{ typingText }}</span>
+      <span class="dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
 
-    <button (click)="send()">Send</button>
+    <div class="chat-input">
+      <input
+        type="text"
+        [(ngModel)]="messageText"
+        placeholder="Type a message..."
+        (keydown)="typing.emit()"
+        (blur)="stopTyping.emit()"
+        (keyup.enter)="send()"
+      />
+      <button (click)="send()">Send</button>
+    </div>
   </div>
 </div>

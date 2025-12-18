@@ -16,6 +16,7 @@ import { NotificationService } from '../../../services/notification/notification
 import { GroupService } from '../../../services/group/group.service';
 import { CreateGroupComponent } from '../../../components/shared/create-group/create-group.component';
 import Swal from 'sweetalert2';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-user-home',
@@ -66,6 +67,24 @@ export class UserHomeComponent implements OnInit {
           }
         });
       });
+    });
+
+    this.socketService.onUserTyping((data: any) => {
+      const { userId, isTyping, chatId } = data;
+
+      if (chatId !== this.activeChat?._id) return;
+
+      if (isTyping) {
+        this.typingUsers.add(userId);
+      } else {
+        this.typingUsers.delete(userId);
+      }
+    });
+
+    this.socketService.onMessageDeleted((data: any) => {
+      if (data.chatId !== this.activeChat?._id) return;
+
+      this.messages = this.messages.filter((msg) => msg._id !== data.messageId);
     });
 
     this.socketService.onNewChat((chat: IChat) => {
@@ -288,5 +307,64 @@ export class UserHomeComponent implements OnInit {
         Swal.fire('Error', err.message || 'Failed to leave group', 'error');
       },
     });
+  }
+
+  typingUsers = new Set<string>();
+  typingTimeout: any;
+
+  onTyping() {
+    if (!this.activeChat) return;
+
+    this.socketService.startTyping(this.activeChat._id, this.loggedInUserId);
+
+    clearTimeout(this.typingTimeout);
+    this.typingTimeout = setTimeout(() => this.stopTyping(), 1000);
+  }
+
+  stopTyping() {
+    if (!this.activeChat) return;
+
+    this.socketService.stopTyping(this.activeChat._id, this.loggedInUserId);
+  }
+
+  get typingText(): string {
+    if (!this.activeChat) return '';
+
+    const names = this.activeChat.participants
+      .filter((p) => this.typingUsers.has(p._id))
+      .map((p) => p.name);
+
+    if (names.length === 0) return '';
+    if (names.length === 1) return `${names[0]} is typing...`;
+    return `Multiple people are typing...`;
+  }
+
+  onDeleteMessage(messageId: string) {
+    console.log("delete message 1");
+    console.log(messageId);
+    
+    if (!this.activeChat) {
+      return;
+    }
+    this.chatService
+      .deleteMessage(messageId)
+      .pipe(take(1))
+      .subscribe({
+        next: (res: ApiResponse<null>) => {
+          this.socketService.emitDeleteMessage(this.activeChat!._id, messageId);
+          Swal.fire(
+            'Message Deleted',
+            res.message || 'You deleted the message successfully',
+            'success'
+          );
+        },
+        error: (err) => {
+          Swal.fire(
+            'Error',
+            err.message || 'Failed to delete message',
+            'error'
+          );
+        },
+      });
   }
 }

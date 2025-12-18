@@ -13,18 +13,22 @@ import { IChat, Participant } from '../../../interfaces/chat.interface';
 export class ChatWindowComponent {
   @Input() messages: IMessage[] = [];
   @Input() activeChat: IChat | null = null;
-  @Output() sendMessageEmitter = new EventEmitter<string>();
+  @Input() typingText = ''; // 👈 NEW
+
+  @Output() sendMessage = new EventEmitter<string>();
   @Output() leaveGroupEmitter = new EventEmitter<string>();
+  @Output() typing = new EventEmitter<void>();
+  @Output() stopTyping = new EventEmitter<void>();
+  @Output() deleteMessage = new EventEmitter<string>();
 
   messageText = '';
   menuOpen = false;
 
-  loggedInUserId: string = localStorage.getItem('userId') || '';
+  protected loggedInUserId = localStorage.getItem('userId');
 
   send() {
     if (!this.messageText.trim()) return;
-
-    this.sendMessageEmitter.emit(this.messageText);
+    this.sendMessage.emit(this.messageText);
     this.messageText = '';
   }
 
@@ -62,5 +66,9 @@ export class ChatWindowComponent {
       ? 'Last seen at ' +
           date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       : 'Last seen on ' + date.toLocaleDateString();
+  }
+
+  onDeleteMessage(messageId: string) {
+    this.deleteMessage.emit(messageId);
   }
 }

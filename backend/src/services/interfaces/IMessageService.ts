@@ -1,3 +1,4 @@
+import { MessageResponseDto } from "../../dto/base.dto";
 import { IMessage } from "../../models/message.model";
 
 export interface IMessageService {
@@ -6,7 +7,8 @@ export interface IMessageService {
     senderId: string,
     message: string
   ): Promise<{ sendMessageResponse: IMessage }>;
-  getMessages(
-    chatId: string
-  ): Promise<{ getMessagesResponse: IMessage[] }>;
+  getMessages(chatId: string): Promise<{ getMessagesResponse: IMessage[] }>;
+  deleteMessage(
+    messageId: string
+  ): Promise<{ deleteMessageResponse: MessageResponseDto }>;
 }

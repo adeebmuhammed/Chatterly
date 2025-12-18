@@ -52,6 +52,26 @@ export class SocketService {
     this.socket.on('userStatusChanged', callback);
   }
 
+  startTyping(chatId: string, userId: string) {
+    this.socket.emit('typing:start', { chatId, userId });
+  }
+
+  stopTyping(chatId: string, userId: string) {
+    this.socket.emit('typing:stop', { chatId, userId });
+  }
+
+  onUserTyping(callback: (data: any) => void) {
+    this.socket.on('userTyping', callback);
+  }
+
+  emitDeleteMessage(chatId: string, messageId: string) {
+    this.socket.emit('deleteMessage', { chatId, messageId });
+  }
+
+  onMessageDeleted(callback: (data: any) => void) {
+    this.socket.on('messageDeleted', callback);
+  }
+
   disconnect() {
     if (this.socket && this.socket.connected) {
       this.socket.disconnect();
