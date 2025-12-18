@@ -53,6 +53,12 @@ export class ChatService {
     return this.http.post(`${this.baseUrl}/message/send`, payload);
   }
 
+  deleteMessage(messageId: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(
+      `${this.baseUrl}/message/${messageId}`
+    );
+  }
+
   searchGroupChats(query: string): Observable<ApiResponse<IChat[]>> {
     const params = new HttpParams().set('q', query);
     return this.http.get<ApiResponse<IChat[]>>(`${this.baseUrl}/group/search`, {

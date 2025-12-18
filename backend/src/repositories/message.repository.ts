@@ -2,9 +2,13 @@ import { injectable } from "inversify";
 import { BaseRepository } from "./base.repository";
 import Messages, { IMessage } from "../models/message.model";
 import mongoose from "mongoose";
+import { IMessageRepository } from "./interfaces/IMessageRepository";
 
 @injectable()
-export class MessageRepository extends BaseRepository<IMessage> {
+export class MessageRepository
+  extends BaseRepository<IMessage>
+  implements IMessageRepository
+{
   constructor() {
     super(Messages);
   }
@@ -14,5 +18,10 @@ export class MessageRepository extends BaseRepository<IMessage> {
       .populate("sender", "name email")
       .sort({ createdAt: 1 })
       .exec();
+  }
+
+  async deleteMessageById(messageId: string): Promise<IMessage | null> {
+    const result = await Messages.findByIdAndDelete(messageId).exec();
+    return result;
   }
 }

@@ -51,4 +51,21 @@ export class MessageController implements IMessageController {
         .json(sendError("Error sending message", error));
     }
   };
+
+  deleteMessage = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const messageId = req.params["messageId"] as string;
+
+      const { deleteMessageResponse } =
+        await this._messageService.deleteMessage(messageId);
+
+      res
+        .status(STATUS_CODES.OK)
+        .json(sendSuccess(deleteMessageResponse.message));
+    } catch (error) {
+      res
+        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json(sendError("Error deleting message", error));
+    }
+  };
 }

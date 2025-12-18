@@ -16,6 +16,7 @@ import { NotificationService } from '../../../services/notification/notification
 import { GroupService } from '../../../services/group/group.service';
 import { CreateGroupComponent } from '../../../components/shared/create-group/create-group.component';
 import Swal from 'sweetalert2';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-user-home',
@@ -53,6 +54,37 @@ export class UserHomeComponent implements OnInit {
         this.socketService.registerUser(userId); // important!
         this.loadChats();
       }
+    });
+
+    this.socketService.onUserStatusChanged((data: any) => {
+      const { userId, status, lastSeen } = data;
+
+      this.chats.forEach((chat) => {
+        chat.participants.forEach((user) => {
+          if (user._id === userId) {
+            user.status = status;
+            user.lastSeen = lastSeen ?? null;
+          }
+        });
+      });
+    });
+
+    this.socketService.onUserTyping((data: any) => {
+      const { userId, isTyping, chatId } = data;
+
+      if (chatId !== this.activeChat?._id) return;
+
+      if (isTyping) {
+        this.typingUsers.add(userId);
+      } else {
+        this.typingUsers.delete(userId);
+      }
+    });
+
+    this.socketService.onMessageDeleted((data: any) => {
+      if (data.chatId !== this.activeChat?._id) return;
+
+      this.messages = this.messages.filter((msg) => msg._id !== data.messageId);
     });
 
     this.socketService.onNewChat((chat: IChat) => {
@@ -174,43 +206,42 @@ export class UserHomeComponent implements OnInit {
   }
 
   onResultSelected(item: any) {
-  if (item.type === 'user') {
-    this.handleUserSelection(item);
-  } else if (item.type === 'group') {
-    this.handleGroupSelection(item);
+    if (item.type === 'user') {
+      this.handleUserSelection(item);
+    } else if (item.type === 'group') {
+      this.handleGroupSelection(item);
+    }
   }
-}
 
-handleUserSelection(user: any) {
-  const payload = {
-    userId: this.loggedInUserId,
-    otherUserId: user.id,
-  };
+  handleUserSelection(user: any) {
+    const payload = {
+      userId: this.loggedInUserId,
+      otherUserId: user.id,
+    };
 
-  this.chatService.findOrCreateChat(payload).subscribe({
-    next: (res: ApiResponse<IChat>) => {
-      const chat = res.data;
-      if (!chat) return;
+    this.chatService.findOrCreateChat(payload).subscribe({
+      next: (res: ApiResponse<IChat>) => {
+        const chat = res.data;
+        if (!chat) return;
 
-      const existingChat = this.chats.find((c) => c._id === chat._id);
-      if (!existingChat) this.chats.unshift(chat);
+        const existingChat = this.chats.find((c) => c._id === chat._id);
+        if (!existingChat) this.chats.unshift(chat);
 
-      this.openChat(chat);
-    },
-    error: (err) => console.error('Error finding or creating chat:', err),
-  });
-}
-
-handleGroupSelection(group: any) {
-  const isMember = group.participants?.includes(this.loggedInUserId);
-
-  if (isMember) {
-    // Already in group → open directly
-    this.openChat(group);
-    return;
+        this.openChat(chat);
+      },
+      error: (err) => console.error('Error finding or creating chat:', err),
+    });
   }
-}
 
+  handleGroupSelection(group: any) {
+    const isMember = group.participants?.includes(this.loggedInUserId);
+
+    if (isMember) {
+      // Already in group → open directly
+      this.openChat(group);
+      return;
+    }
+  }
 
   openChat(chat: IChat) {
     this.activeChat = chat;
@@ -245,17 +276,16 @@ handleGroupSelection(group: any) {
   }
 
   markChatAsUnread(chatId: string, data: any) {
-  const chat = this.chats.find((c) => c._id === chatId);
-  if (!chat) return;
+    const chat = this.chats.find((c) => c._id === chatId);
+    if (!chat) return;
 
-  chat.hasUnread = true;
-  chat.lastMessage = data.message;
-  chat.lastMessageSender = data.senderId;
-  chat.updatedAt = new Date();
+    chat.hasUnread = true;
+    chat.lastMessage = data.message;
+    chat.lastMessageSender = data.senderId;
+    chat.updatedAt = new Date();
 
-  this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
-}
-
+    this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
+  }
 
   onLeaveGroup(chatId: string) {
     this.groupService.leaveGroup(this.loggedInUserId, chatId).subscribe({
@@ -277,5 +307,64 @@ handleGroupSelection(group: any) {
         Swal.fire('Error', err.message || 'Failed to leave group', 'error');
       },
     });
+  }
+
+  typingUsers = new Set<string>();
+  typingTimeout: any;
+
+  onTyping() {
+    if (!this.activeChat) return;
+
+    this.socketService.startTyping(this.activeChat._id, this.loggedInUserId);
+
+    clearTimeout(this.typingTimeout);
+    this.typingTimeout = setTimeout(() => this.stopTyping(), 1000);
+  }
+
+  stopTyping() {
+    if (!this.activeChat) return;
+
+    this.socketService.stopTyping(this.activeChat._id, this.loggedInUserId);
+  }
+
+  get typingText(): string {
+    if (!this.activeChat) return '';
+
+    const names = this.activeChat.participants
+      .filter((p) => this.typingUsers.has(p._id))
+      .map((p) => p.name);
+
+    if (names.length === 0) return '';
+    if (names.length === 1) return `${names[0]} is typing...`;
+    return `Multiple people are typing...`;
+  }
+
+  onDeleteMessage(messageId: string) {
+    console.log("delete message 1");
+    console.log(messageId);
+    
+    if (!this.activeChat) {
+      return;
+    }
+    this.chatService
+      .deleteMessage(messageId)
+      .pipe(take(1))
+      .subscribe({
+        next: (res: ApiResponse<null>) => {
+          this.socketService.emitDeleteMessage(this.activeChat!._id, messageId);
+          Swal.fire(
+            'Message Deleted',
+            res.message || 'You deleted the message successfully',
+            'success'
+          );
+        },
+        error: (err) => {
+          Swal.fire(
+            'Error',
+            err.message || 'Failed to delete message',
+            'error'
+          );
+        },
+      });
   }
 }

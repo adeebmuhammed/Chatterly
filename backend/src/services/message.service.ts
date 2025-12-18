@@ -6,6 +6,7 @@ import { IMessage } from "../models/message.model";
 import { IMessageService } from "./interfaces/IMessageService";
 import { IChat } from "../models/chat.model";
 import { IChatRepository } from "../repositories/interfaces/IChatRepository";
+import { MessageResponseDto } from "../dto/base.dto";
 
 @injectable()
 export class MessageService implements IMessageService {
@@ -41,5 +42,25 @@ export class MessageService implements IMessageService {
     );
 
     return { getMessagesResponse };
+  };
+
+  deleteMessage = async (
+    messageId: string
+  ): Promise<{ deleteMessageResponse: MessageResponseDto }> => {
+    const message = this._messageRepo.findById(messageId);
+    if (!message) {
+      throw new Error("message not found");
+    }
+
+    const deleted = await this._messageRepo.deleteMessageById(messageId);
+    if (!deleted) {
+      throw new Error("failed to delete message");
+    }
+
+    const deleteMessageResponse: MessageResponseDto = {
+      message: "message deleted successfully",
+    };
+
+    return { deleteMessageResponse };
   };
 }

@@ -6,6 +6,7 @@ import { HttpResponse } from '@angular/common/http';
 import { ApiResponse } from '../../../interfaces/common-interface';
 import Swal from 'sweetalert2';
 import { USER_ROUTES_PATHS } from '../../../constants/user-route.constant';
+import { SocketService } from '../../../services/socket/socket.service';
 
 @Component({
   selector: 'app-user-header',
@@ -18,6 +19,7 @@ export class UserHeaderComponent implements OnInit {
 
   private authService: AuthService = inject(AuthService);
   private router: Router = inject(Router);
+  private socketService: SocketService = inject(SocketService);
 
   ngOnInit(): void {
     this.authService.isUserLoggedIn$
@@ -31,6 +33,8 @@ export class UserHeaderComponent implements OnInit {
       .pipe(take(1))
       .subscribe({
         next: (res: ApiResponse<null>) => {
+          this.socketService.disconnect();
+
           Swal.fire({
             icon: 'success',
             title: 'Logged Out',

@@ -3,18 +3,27 @@
 <!-- Search Bar Wrapper -->
 <div class="top-search-bar">
   <div class="search-toggle">
-  <button (click)="searchType = 'user'" [class.active]="searchType === 'user'">Users</button>
-  <button (click)="searchType = 'group'" [class.active]="searchType === 'group'">Groups</button>
-</div>
+    <button
+      (click)="searchType = 'user'"
+      [class.active]="searchType === 'user'"
+    >
+      Users
+    </button>
+    <button
+      (click)="searchType = 'group'"
+      [class.active]="searchType === 'group'"
+    >
+      Groups
+    </button>
+  </div>
 
   <app-search
-  [searchResults]="results"
-  [searchType]="searchType"
-  (search)="onSearch($event)"
-  (itemSelected)="onResultSelected($event)"
-  (joinGroup)="onJoinGroup($event)"
-></app-search>
-
+    [searchResults]="results"
+    [searchType]="searchType"
+    (search)="onSearch($event)"
+    (itemSelected)="onResultSelected($event)"
+    (joinGroup)="onJoinGroup($event)"
+  ></app-search>
 </div>
 
 <div class="chat-container">
@@ -37,8 +46,12 @@
       <app-chat-window
         [messages]="messages"
         [activeChat]="activeChat"
-        (sendMessageEmitter)="onSendMessage($event)"
-        (leaveGroupEmitter)="onLeaveGroup($event)"
+        [typingText]="typingText"
+        (sendMessage)="onSendMessage($event)"
+        (deleteMessage)="onDeleteMessage($event)"
+        (leaveGroup)="onLeaveGroup(activeChat!._id)"
+        (typing)="onTyping()"
+        (stopTyping)="stopTyping()"
       ></app-chat-window>
     </ng-container>
 
