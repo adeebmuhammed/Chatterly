@@ -1,13 +1,32 @@
 import { Server, Socket } from "socket.io";
 import { sendPushNotification } from "../utils/notification";
+import { USER_ACTIVE_STATUS } from "../utils/constants";
+import { container } from "../config/inversify";
+import { IUserRepository } from "../repositories/interfaces/IUserRepository";
+import { TYPES } from "../config/types";
+
+const _userRepo = container.get<IUserRepository>(TYPES.IUserRepository);
 
 export const socketHandler = (io: Server) => {
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
 
     // Register user
-    socket.on("registerUser", (userId: string) => {
+    socket.on("registerUser", async (userId: string) => {
       socket.join(userId);
+      socket.data.userId = userId; // store for disconnect
+
+      // ✅ Mark user ONLINE
+      await _userRepo.update(userId, {
+        status: USER_ACTIVE_STATUS.ONLINE,
+        lastSeen: null,
+      });
+
+      socket.broadcast.emit("userStatusChanged", {
+        userId,
+        status: USER_ACTIVE_STATUS.ONLINE,
+      });
+
       console.log(`User ${socket.id} registered as ${userId}`);
     });
 
@@ -87,7 +106,23 @@ export const socketHandler = (io: Server) => {
     });
 
     // Disconnect
-    socket.on("disconnect", () => {
+    socket.on("disconnect", async () => {
+      const userId = socket.data.userId;
+      if (!userId) return;
+
+      // ✅ Mark user OFFLINE
+      await _userRepo.update(userId, {
+        status: USER_ACTIVE_STATUS.OFFLINE,
+        lastSeen: new Date(),
+      });
+
+      // Notify others
+      socket.broadcast.emit("userStatusChanged", {
+        userId,
+        status: USER_ACTIVE_STATUS.OFFLINE,
+        lastSeen: new Date(),
+      });
+
       console.log("User disconnected:", socket.id);
     });
   });

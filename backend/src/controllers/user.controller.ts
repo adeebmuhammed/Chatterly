@@ -18,21 +18,20 @@ export class UserController implements IUserController {
       const { loginResponse } = await this._userService.login(email, password);
       const refreshToken = generateRefreshToken({ userId: loginResponse.id });
 
-     res.cookie("auth-token", loginResponse.token, {
-  httpOnly: true,
-  secure: true,      // REQUIRED
-  sameSite: "none",  // REQUIRED
-  path: "/",
-});
+      res.cookie("auth-token", loginResponse.token, {
+        httpOnly: true,
+        secure: true, // REQUIRED
+        sameSite: "none", // REQUIRED
+        path: "/",
+      });
 
-res.cookie("refresh-token", refreshToken, {
-  httpOnly: true,
-  secure: false,
-  sameSite: "lax",
-  path: "/",
-  maxAge: 1000 * 60 * 60 * 24 * 7,
-});
-
+      res.cookie("refresh-token", refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+      });
 
       res
         .status(STATUS_CODES.OK)
@@ -136,10 +135,14 @@ res.cookie("refresh-token", refreshToken, {
           .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
           .json(sendError("Users Not Found"));
       } else {
-        res.status(STATUS_CODES.OK).json(sendSuccess("Users fetched successfully", users));
+        res
+          .status(STATUS_CODES.OK)
+          .json(sendSuccess("Users fetched successfully", users));
       }
     } catch (error) {
-      res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(sendError("Error Searching Users"));
+      res
+        .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json(sendError("Error Searching Users"));
     }
   };
 }

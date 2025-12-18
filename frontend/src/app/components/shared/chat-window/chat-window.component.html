@@ -15,16 +15,29 @@
 
         <!-- Private Chat -->
         <ng-template #privateChat>
-          <div class="name">{{ getOtherParticipantName(activeChat) }}</div>
+          <ng-container *ngIf="getOtherParticipant(activeChat) as otherUser">
+            <div class="name">{{ otherUser.name }}</div>
+
+            <div class="sub">
+              <span
+                class="status-dot"
+                [class.online]="isOnline(otherUser)"
+                [class.offline]="!isOnline(otherUser)"
+              ></span>
+
+              <span *ngIf="isOnline(otherUser)">Online</span>
+              <span *ngIf="!isOnline(otherUser)">
+                {{ getLastSeenText(otherUser) }}
+              </span>
+            </div>
+          </ng-container>
         </ng-template>
       </div>
     </div>
 
     <!-- Right - Menu -->
     <div class="menu-wrapper">
-      <button class="menu-btn" (click)="toggleMenu()">
-        ⋮
-      </button>
+      <button class="menu-btn" (click)="toggleMenu()">⋮</button>
 
       <div *ngIf="menuOpen" class="menu">
         <!-- Visible only for groups -->

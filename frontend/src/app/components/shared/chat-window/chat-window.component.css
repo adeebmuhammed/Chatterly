@@ -110,3 +110,23 @@
   cursor: pointer;
   font-size: 15px;
 }
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.status-dot.online {
+  background-color: #2ecc71;
+}
+
+.status-dot.offline {
+  background-color: #b0b0b0;
+}
+
+.sub {
+  font-size: 12px;
+  color: #777;
+}

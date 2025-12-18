@@ -1,4 +1,4 @@
-import { UserStatus } from "./common-interface";
+import { UserStatus } from './common-interface';
 
 export interface IChat {
   _id: string;
@@ -6,7 +6,7 @@ export interface IChat {
   isGroup: boolean;
   groupName?: string;
   createdBy?: Creator;
-   lastMessage?: string | null;
+  lastMessage?: string | null;
   lastMessageSender?: string | null;
   lastMessageAt?: Date | null;
   createdAt: Date;
@@ -25,7 +25,7 @@ export interface IChatUI extends IChat {
   hasUnread?: boolean;
 }
 
-interface Creator{
+interface Creator {
   _id: string;
   name: string;
   email: string;

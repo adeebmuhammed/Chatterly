@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import { Router } from "express";
 import { container } from "../config/inversify";
 import { IUserController } from "../controllers/interfaces/IUserController";
 import { TYPES } from "../config/types";

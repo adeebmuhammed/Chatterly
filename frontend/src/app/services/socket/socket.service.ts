@@ -47,4 +47,14 @@ export class SocketService {
   emitLeaveGroup(chatId: string, userId: string) {
     this.socket.emit('leaveGroupEvent', { chatId, userId });
   }
+
+  onUserStatusChanged(callback: any) {
+    this.socket.on('userStatusChanged', callback);
+  }
+
+  disconnect() {
+    if (this.socket && this.socket.connected) {
+      this.socket.disconnect();
+    }
+  }
 }
