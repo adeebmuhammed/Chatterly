@@ -6,5 +6,6 @@ export declare class MessageController implements IMessageController {
     constructor(_messageService: IMessageService);
     getMessages: (req: Request, res: Response) => Promise<void>;
     sendMessage: (req: Request, res: Response) => Promise<void>;
+    deleteMessage: (req: Request, res: Response) => Promise<void>;
 }
 //# sourceMappingURL=message.controller.d.ts.map

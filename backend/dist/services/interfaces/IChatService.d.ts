@@ -6,5 +6,6 @@ export interface IChatService {
     getUserChats(userId: string): Promise<{
         userChats: IChat[];
     }>;
+    searchGroupChats(query: string): Promise<IChat[]>;
 }
 //# sourceMappingURL=IChatService.d.ts.map

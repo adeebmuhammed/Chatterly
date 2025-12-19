@@ -12,5 +12,6 @@ export declare class ChatService implements IChatService {
     findOrCreateChat: (userId: string, otherUserId: string) => Promise<{
         findOrCreateChatResponse: IChat;
     }>;
+    searchGroupChats: (query: string) => Promise<IChat[]>;
 }
 //# sourceMappingURL=chat.service.d.ts.map

@@ -20,9 +20,14 @@ const inversify_1 = require("inversify");
 const types_1 = require("../config/types");
 const mongoose_1 = __importDefault(require("mongoose"));
 let MessageService = class MessageService {
-    constructor(_messageRepo) {
+    constructor(_messageRepo, _chatRepo) {
         this._messageRepo = _messageRepo;
+        this._chatRepo = _chatRepo;
         this.sendMessage = async (chatId, senderId, message) => {
+            const chat = await this._chatRepo.findById(chatId);
+            if (!chat) {
+                throw new Error("Chat not found");
+            }
             const sendMessageResponse = await this._messageRepo.create({
                 chatId: new mongoose_1.default.Types.ObjectId(chatId),
                 sender: new mongoose_1.default.Types.ObjectId(senderId),
@@ -34,12 +39,27 @@ let MessageService = class MessageService {
             const getMessagesResponse = await this._messageRepo.getMessagesByChat(chatId);
             return { getMessagesResponse };
         };
+        this.deleteMessage = async (messageId) => {
+            const message = this._messageRepo.findById(messageId);
+            if (!message) {
+                throw new Error("message not found");
+            }
+            const deleted = await this._messageRepo.deleteMessageById(messageId);
+            if (!deleted) {
+                throw new Error("failed to delete message");
+            }
+            const deleteMessageResponse = {
+                message: "message deleted successfully",
+            };
+            return { deleteMessageResponse };
+        };
     }
 };
 exports.MessageService = MessageService;
 exports.MessageService = MessageService = __decorate([
     (0, inversify_1.injectable)(),
     __param(0, (0, inversify_1.inject)(types_1.TYPES.IMessageRepository)),
-    __metadata("design:paramtypes", [Object])
+    __param(1, (0, inversify_1.inject)(types_1.TYPES.IChatRepository)),
+    __metadata("design:paramtypes", [Object, Object])
 ], MessageService);
 //# sourceMappingURL=message.service.js.map
