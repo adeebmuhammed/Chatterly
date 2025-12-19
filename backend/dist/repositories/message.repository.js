@@ -16,15 +16,20 @@ exports.MessageRepository = void 0;
 const inversify_1 = require("inversify");
 const base_repository_1 = require("./base.repository");
 const message_model_1 = __importDefault(require("../models/message.model"));
+const mongoose_1 = __importDefault(require("mongoose"));
 let MessageRepository = class MessageRepository extends base_repository_1.BaseRepository {
     constructor() {
         super(message_model_1.default);
     }
     async getMessagesByChat(chatId) {
-        return message_model_1.default.find({ chatId })
+        return message_model_1.default.find({ chatId: new mongoose_1.default.Types.ObjectId(chatId) })
             .populate("sender", "name email")
             .sort({ createdAt: 1 })
             .exec();
+    }
+    async deleteMessageById(messageId) {
+        const result = await message_model_1.default.findByIdAndDelete(messageId).exec();
+        return result;
     }
 };
 exports.MessageRepository = MessageRepository;

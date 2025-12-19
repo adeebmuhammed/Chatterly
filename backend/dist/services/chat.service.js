@@ -33,6 +33,10 @@ let ChatService = class ChatService {
             let findOrCreateChatResponse = await this._chatRepo.findOrCreateOneOnOne(userId, otherUserId);
             return { findOrCreateChatResponse };
         };
+        this.searchGroupChats = async (query) => {
+            const groups = await this._chatRepo.searchGroupChats(query);
+            return groups;
+        };
     }
 };
 exports.ChatService = ChatService;

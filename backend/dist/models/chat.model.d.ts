@@ -4,6 +4,7 @@ export interface IChat extends Document {
     participants: mongoose.Types.ObjectId[];
     isGroup: boolean;
     groupName?: string;
+    createdBy?: mongoose.Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
 }

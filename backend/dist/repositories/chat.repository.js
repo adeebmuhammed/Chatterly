@@ -16,6 +16,7 @@ exports.ChatRepository = void 0;
 const inversify_1 = require("inversify");
 const base_repository_1 = require("./base.repository");
 const chat_model_1 = __importDefault(require("../models/chat.model"));
+const mongoose_1 = __importDefault(require("mongoose"));
 let ChatRepository = class ChatRepository extends base_repository_1.BaseRepository {
     constructor() {
         super(chat_model_1.default);
@@ -24,22 +25,105 @@ let ChatRepository = class ChatRepository extends base_repository_1.BaseReposito
         let chat = await chat_model_1.default.findOne({
             isGroup: false,
             participants: { $all: [user1, user2] },
-        });
+        })
+            .populate("participants", "name email status lastSeen")
+            .exec();
+        // Create if not exists
         if (!chat) {
             chat = await chat_model_1.default.create({
                 participants: [user1, user2],
                 isGroup: false,
             });
+            chat = await chat_model_1.default.findById(chat._id)
+                .populate("participants", "name email status lastSeen")
+                .exec();
+            if (!chat) {
+                throw new Error("Failed to create chat");
+            }
         }
         return chat;
     }
     async getUserChats(userId) {
-        return chat_model_1.default.find({
-            participants: { $in: [userId] },
+        return chat_model_1.default.aggregate([
+            // 1️⃣ Only chats where user is a participant
+            {
+                $match: {
+                    participants: new mongoose_1.default.Types.ObjectId(userId),
+                },
+            },
+            // 2️⃣ Lookup last message
+            {
+                $lookup: {
+                    from: "messages",
+                    let: { chatId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ["$chatId", "$$chatId"] },
+                            },
+                        },
+                        { $sort: { createdAt: -1 } },
+                        { $limit: 1 },
+                    ],
+                    as: "lastMessage",
+                },
+            },
+            // 3️⃣ Flatten lastMessage array
+            {
+                $unwind: {
+                    path: "$lastMessage",
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            // 4️⃣ Populate participants
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "participants",
+                    foreignField: "_id",
+                    as: "participants",
+                },
+            },
+            // 5️⃣ Shape final output
+            {
+                $project: {
+                    participants: {
+                        _id: 1,
+                        name: 1,
+                        email: 1,
+                        status: 1,
+                        lastSeen: 1,
+                    },
+                    isGroup: 1,
+                    groupName: 1,
+                    createdBy: 1,
+                    updatedAt: 1,
+                    lastMessage: "$lastMessage.message",
+                    lastMessageSender: "$lastMessage.sender",
+                    lastMessageAt: "$lastMessage.createdAt",
+                },
+            },
+            // 6️⃣ Sort chats by last activity
+            {
+                $sort: {
+                    lastMessageAt: -1,
+                    updatedAt: -1,
+                },
+            },
+        ]);
+    }
+    async deleteChatById(chatId) {
+        const result = await chat_model_1.default.findByIdAndDelete(chatId).exec();
+        return result;
+    }
+    async searchGroupChats(query) {
+        const groups = await chat_model_1.default.find({
+            isGroup: true,
+            groupName: { $regex: query, $options: "i" },
         })
-            .populate("participants", "name email status lastSeen")
-            .sort({ updatedAt: -1 })
+            .populate("createdBy", "name email")
             .exec();
+        return groups;
     }
 };
 exports.ChatRepository = ChatRepository;

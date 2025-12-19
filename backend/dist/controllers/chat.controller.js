@@ -16,6 +16,7 @@ exports.ChatController = void 0;
 const inversify_1 = require("inversify");
 const types_1 = require("../config/types");
 const response_helper_1 = require("../utils/response.helper");
+const constants_1 = require("../utils/constants");
 let ChatController = class ChatController {
     constructor(_chatService) {
         this._chatService = _chatService;
@@ -23,22 +24,45 @@ let ChatController = class ChatController {
             try {
                 const userId = req.params.userId;
                 const { userChats } = await this._chatService.getUserChats(userId);
-                res.status(200).json((0, response_helper_1.sendSuccess)("Chats fetched successfully", userChats));
+                res
+                    .status(constants_1.STATUS_CODES.OK)
+                    .json((0, response_helper_1.sendSuccess)("Chats fetched successfully", userChats));
             }
             catch (error) {
-                res.status(500).json({ message: "Error fetching chats", error });
+                res
+                    .status(constants_1.STATUS_CODES.INTERNAL_SERVER_ERROR)
+                    .json((0, response_helper_1.sendError)("Failed to fetch chats", error));
             }
         };
         this.findOrCreateChat = async (req, res) => {
             try {
                 const { userId, otherUserId } = req.body;
                 const { findOrCreateChatResponse } = await this._chatService.findOrCreateChat(userId, otherUserId);
+                const io = req.app.get("io");
+                // Notify the other user
+                io.to(otherUserId).emit("newChat", findOrCreateChatResponse);
                 res
-                    .status(200)
+                    .status(constants_1.STATUS_CODES.OK)
                     .json((0, response_helper_1.sendSuccess)("Conversation found or created successfully", findOrCreateChatResponse));
             }
             catch (error) {
-                res.status(500).json({ message: "Error finding conversation", error });
+                res
+                    .status(constants_1.STATUS_CODES.INTERNAL_SERVER_ERROR)
+                    .json((0, response_helper_1.sendError)("Failed to find or create chat", error));
+            }
+        };
+        this.searchGroupChats = async (req, res) => {
+            try {
+                const query = req.query.q;
+                const groups = await this._chatService.searchGroupChats(query);
+                res
+                    .status(constants_1.STATUS_CODES.OK)
+                    .json((0, response_helper_1.sendSuccess)("Groups Fetched Successfully", groups));
+            }
+            catch (error) {
+                res
+                    .status(constants_1.STATUS_CODES.INTERNAL_SERVER_ERROR)
+                    .json((0, response_helper_1.sendError)("Error Searching Group Chats"));
             }
         };
     }

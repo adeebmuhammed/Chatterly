@@ -11,7 +11,6 @@ import { UserSearchResultResponse } from '../../../interfaces/user.interface';
 import { ApiResponse } from '../../../interfaces/common-interface';
 import { IChat, IChatUI } from '../../../interfaces/chat.interface';
 import { IMessage } from '../../../interfaces/message.interface';
-import { FILE_TYPES } from '../../../constants/constants';
 import { NotificationService } from '../../../services/notification/notification.service';
 import { GroupService } from '../../../services/group/group.service';
 import { CreateGroupComponent } from '../../../components/shared/create-group/create-group.component';
@@ -340,9 +339,9 @@ export class UserHomeComponent implements OnInit {
   }
 
   onDeleteMessage(messageId: string) {
-    console.log("delete message 1");
+    console.log('delete message 1');
     console.log(messageId);
-    
+
     if (!this.activeChat) {
       return;
     }

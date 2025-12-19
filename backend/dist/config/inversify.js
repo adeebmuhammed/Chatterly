@@ -13,6 +13,8 @@ const chat_controller_1 = require("../controllers/chat.controller");
 const chat_service_1 = require("../services/chat.service");
 const message_service_1 = require("../services/message.service");
 const message_controller_1 = require("../controllers/message.controller");
+const group_controller_1 = require("../controllers/group.controller");
+const group_service_1 = require("../services/group.service");
 const container = new inversify_1.Container();
 exports.container = container;
 container.bind(types_1.TYPES.IUserController).to(user_controller_1.UserController);
@@ -25,4 +27,6 @@ container.bind(types_1.TYPES.IChatRepository).to(chat_repository_1.ChatRepositor
 container.bind(types_1.TYPES.IMessageService).to(message_service_1.MessageService);
 container.bind(types_1.TYPES.IMessageController).to(message_controller_1.MessageController);
 container.bind(types_1.TYPES.IMessageRepository).to(message_repository_1.MessageRepository);
+container.bind(types_1.TYPES.IGroupController).to(group_controller_1.GroupController);
+container.bind(types_1.TYPES.IGroupService).to(group_service_1.GroupService);
 //# sourceMappingURL=inversify.js.map

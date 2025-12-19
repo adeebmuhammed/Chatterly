@@ -39,11 +39,23 @@ const ChatSchema = new mongoose_1.Schema({
         {
             type: mongoose_1.default.Schema.Types.ObjectId,
             ref: "Users",
-            required: true
-        }
+            required: true,
+        },
     ],
     isGroup: { type: Boolean, default: false },
-    groupName: { type: String, default: null },
+    groupName: {
+        type: String,
+        required: function () {
+            return this.isGroup;
+        },
+    },
+    createdBy: {
+        type: mongoose_1.default.Schema.Types.ObjectId,
+        ref: "Users",
+        required: function () {
+            return this.isGroup;
+        },
+    },
 }, { timestamps: true });
 const Chats = mongoose_1.default.model("Chats", ChatSchema);
 exports.default = Chats;

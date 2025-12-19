@@ -36,8 +36,8 @@ let MessageController = class MessageController {
         };
         this.sendMessage = async (req, res) => {
             try {
-                const { conversationId, senderId, message } = req.body;
-                const { sendMessageResponse } = await this._messageService.sendMessage(conversationId, senderId, message);
+                const { chatId, senderId, message } = req.body;
+                const { sendMessageResponse } = await this._messageService.sendMessage(chatId, senderId, message);
                 res
                     .status(constants_1.STATUS_CODES.OK)
                     .json((0, response_helper_1.sendSuccess)("Message sent successfully", sendMessageResponse));
@@ -46,6 +46,20 @@ let MessageController = class MessageController {
                 res
                     .status(constants_1.STATUS_CODES.INTERNAL_SERVER_ERROR)
                     .json((0, response_helper_1.sendError)("Error sending message", error));
+            }
+        };
+        this.deleteMessage = async (req, res) => {
+            try {
+                const messageId = req.params["messageId"];
+                const { deleteMessageResponse } = await this._messageService.deleteMessage(messageId);
+                res
+                    .status(constants_1.STATUS_CODES.OK)
+                    .json((0, response_helper_1.sendSuccess)(deleteMessageResponse.message));
+            }
+            catch (error) {
+                res
+                    .status(constants_1.STATUS_CODES.INTERNAL_SERVER_ERROR)
+                    .json((0, response_helper_1.sendError)("Error deleting message", error));
             }
         };
     }

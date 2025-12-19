@@ -27,16 +27,17 @@ let UserController = class UserController {
                 const { loginResponse } = await this._userService.login(email, password);
                 const refreshToken = (0, jwt_generator_1.generateRefreshToken)({ userId: loginResponse.id });
                 res.cookie("auth-token", loginResponse.token, {
-                    httpOnly: process.env.AUTH_TOKEN_HTTP_ONLY === "true",
-                    secure: process.env.AUTH_TOKEN_SECURE === "true",
-                    sameSite: process.env.AUTH_TOKEN_SAME_SITE,
-                    maxAge: Number(process.env.AUTH_TOKEN_MAX_AGE),
+                    httpOnly: true,
+                    secure: true, // REQUIRED
+                    sameSite: "none", // REQUIRED
+                    path: "/",
                 });
                 res.cookie("refresh-token", refreshToken, {
-                    httpOnly: process.env.REFRESH_TOKEN_HTTP_ONLY === "true",
-                    secure: process.env.REFRESH_TOKEN_SECURE === "true",
-                    sameSite: process.env.REFRESH_TOKEN_SAME_SITE,
-                    maxAge: Number(process.env.REFRESH_TOKEN_MAX_AGE),
+                    httpOnly: true,
+                    secure: false,
+                    sameSite: "lax",
+                    path: "/",
+                    maxAge: 1000 * 60 * 60 * 24 * 7,
                 });
                 res
                     .status(constants_1.STATUS_CODES.OK)
@@ -123,11 +124,15 @@ let UserController = class UserController {
                         .json((0, response_helper_1.sendError)("Users Not Found"));
                 }
                 else {
-                    res.status(200).json((0, response_helper_1.sendSuccess)("Users fetched successfully", users));
+                    res
+                        .status(constants_1.STATUS_CODES.OK)
+                        .json((0, response_helper_1.sendSuccess)("Users fetched successfully", users));
                 }
             }
             catch (error) {
-                res.status(500).json({ message: "Error searching users", error });
+                res
+                    .status(constants_1.STATUS_CODES.INTERNAL_SERVER_ERROR)
+                    .json((0, response_helper_1.sendError)("Error Searching Users"));
             }
         };
     }

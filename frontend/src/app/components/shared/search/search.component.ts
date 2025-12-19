@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { UserSearchResultResponse } from '../../../interfaces/user.interface';
+import { IChat } from '../../../interfaces/chat.interface';
 
 @Component({
   selector: 'app-search',
@@ -26,7 +27,7 @@ export class SearchComponent implements OnChanges, OnInit {
   }>();
   @Output() itemSelected = new EventEmitter<any>();
   @Output() joinGroup = new EventEmitter<any>();
-  public loggedInUserId: string | null = '';
+  protected loggedInUserId: string | null = '';
 
   ngOnInit(): void {
     this.loggedInUserId = localStorage.getItem('userId');
@@ -46,8 +47,9 @@ export class SearchComponent implements OnChanges, OnInit {
     this.searchSubject.next(value);
   }
 
-  onResultClick(item: any) {
-    this.itemSelected.emit(item);
+  onResultClick(item: any, type: 'user' | 'group') {
+    const payload = { ...item, type }; // spread is OK here
+    this.itemSelected.emit(payload);
     this.searchQuery = '';
   }
 
