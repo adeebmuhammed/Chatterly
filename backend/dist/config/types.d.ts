@@ -11,6 +11,8 @@ declare const TYPES: {
     IMessageController: symbol;
     IGroupController: symbol;
     IGroupService: symbol;
+    INotificationRepository: symbol;
+    ISubscriptionRepository: symbol;
 };
 export { TYPES };
 //# sourceMappingURL=types.d.ts.map

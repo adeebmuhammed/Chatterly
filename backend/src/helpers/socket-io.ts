@@ -1,9 +1,9 @@
 import { Server, Socket } from "socket.io";
-import { sendPushNotification } from "../utils/notification";
 import { USER_ACTIVE_STATUS } from "../utils/constants";
 import { container } from "../config/inversify";
 import { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { TYPES } from "../config/types";
+import { sendPushToUser } from "../utils/notification";
 
 const _userRepo = container.get<IUserRepository>(TYPES.IUserRepository);
 
@@ -36,8 +36,7 @@ export const socketHandler = (io: Server) => {
       console.log(`User ${socket.id} joined room ${chatId}`);
     });
 
-    // Send message
-    socket.on("sendMessage", (data) => {
+    socket.on("sendMessage", async (data) => {
       const messageToSend = {
         chatId: data.chatId,
         sender: { _id: data.senderId },
@@ -45,42 +44,46 @@ export const socketHandler = (io: Server) => {
         createdAt: new Date(),
       };
 
-      // Push notification message
-      const messageData = {
-        title: "New Message",
-        body: data.message,
-        chatId: data.chatId,
-        senderId: data.senderId,
-      };
-
-      sendPushNotification(messageData);
-
-      // Broadcast message to room (group chat OR normal chat)
       io.to(data.chatId).emit("receiveMessage", messageToSend);
 
-      // --- NEW: Group chat notifications ---
+      // GROUP CHAT
       if (Array.isArray(data.receiverIds)) {
-        data.receiverIds
-          .filter((id: string) => id !== data.senderId) // don't notify self
-          .forEach((userId: string) => {
-            io.to(userId).emit("newMessageNotification", {
-              chatId: data.chatId,
-              message: data.message,
-              senderId: data.senderId,
-              createdAt: new Date(),
-            });
+        for (const userId of data.receiverIds) {
+          if (userId === data.senderId) continue;
+
+          // 🔔 socket notification
+          io.to(userId).emit("newMessageNotification", {
+            chatId: data.chatId,
+            message: data.message,
+            senderId: data.senderId,
+            createdAt: new Date(),
           });
 
-        return; // done for group messages
+          // 📱 push notification (DB-backed)
+          await sendPushToUser(userId, {
+            title: "New Message",
+            body: data.message,
+            chatId: data.chatId,
+            senderId: data.senderId,
+          });
+        }
+        return;
       }
 
-      // --- Old: 1-on-1 chat fallback ---
+      // 1-to-1 CHAT
       if (data.receiverId) {
         io.to(data.receiverId).emit("newMessageNotification", {
           chatId: data.chatId,
           message: data.message,
           senderId: data.senderId,
           createdAt: new Date(),
+        });
+
+        await sendPushToUser(data.receiverId, {
+          title: "New Message",
+          body: data.message,
+          chatId: data.chatId,
+          senderId: data.senderId,
         });
       }
     });

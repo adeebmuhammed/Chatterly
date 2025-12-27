@@ -105,8 +105,6 @@ export class UserHomeComponent implements OnInit {
         this.markChatAsUnread(data.chatId, data);
       }
     });
-
-    this.notificationService.subscribeToPush();
   }
 
   openCreateGroupModal() {
