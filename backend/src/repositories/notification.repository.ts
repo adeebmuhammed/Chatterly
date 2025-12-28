@@ -13,7 +13,7 @@ export class NotificationRepository
     super(Notification);
   }
 
-  createNotification = async ({
+  async createNotification({
     userId,
     title,
     body,
@@ -27,7 +27,7 @@ export class NotificationRepository
     chatId?: string;
     senderId?: string;
     type?: NOTIFICATION_TYPE;
-  }) => {
+  }): Promise<INotification> {
     return Notification.create({
       user: userId,
       title,

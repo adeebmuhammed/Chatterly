@@ -11,6 +11,7 @@ import { NotificationService } from './services/notification/notification.servic
 export class AppComponent implements OnInit {
   title = 'Chatterly';
   private notificationService = inject(NotificationService);
+  private loggedInUserId: string | null = localStorage.getItem('userId');
   ngOnInit(): void {
     this.notificationService.subscribeToPush();
   }

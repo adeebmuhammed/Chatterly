@@ -4,8 +4,12 @@ import { container } from "../config/inversify";
 import { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { TYPES } from "../config/types";
 import { sendPushToUser } from "../utils/notification";
+import { INotificationRepository } from "../repositories/interfaces/INotificationRepository";
 
 const _userRepo = container.get<IUserRepository>(TYPES.IUserRepository);
+const notificationRepo = container.get<INotificationRepository>(
+  TYPES.INotificationRepository
+);
 
 export const socketHandler = (io: Server) => {
   io.on("connection", (socket: Socket) => {
@@ -51,7 +55,16 @@ export const socketHandler = (io: Server) => {
         for (const userId of data.receiverIds) {
           if (userId === data.senderId) continue;
 
-          // 🔔 socket notification
+          // 💾 SAVE notification
+          await notificationRepo.createNotification({
+            userId,
+            title: "New Message",
+            body: data.message,
+            chatId: data.chatId,
+            senderId: data.senderId,
+          });
+
+          // 🔔 socket
           io.to(userId).emit("newMessageNotification", {
             chatId: data.chatId,
             message: data.message,
@@ -59,7 +72,7 @@ export const socketHandler = (io: Server) => {
             createdAt: new Date(),
           });
 
-          // 📱 push notification (DB-backed)
+          // 📱 push
           await sendPushToUser(userId, {
             title: "New Message",
             body: data.message,
@@ -67,11 +80,20 @@ export const socketHandler = (io: Server) => {
             senderId: data.senderId,
           });
         }
+
         return;
       }
 
       // 1-to-1 CHAT
       if (data.receiverId) {
+        await notificationRepo.createNotification({
+          userId: data.receiverId,
+          title: "New Message",
+          body: data.message,
+          chatId: data.chatId,
+          senderId: data.senderId,
+        });
+
         io.to(data.receiverId).emit("newMessageNotification", {
           chatId: data.chatId,
           message: data.message,
