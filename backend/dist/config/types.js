@@ -14,6 +14,8 @@ const TYPES = {
     IMessageController: Symbol.for("IMessageController"),
     IGroupController: Symbol.for("IGroupController"),
     IGroupService: Symbol.for("IGroupService"),
+    INotificationRepository: Symbol.for("INotificationRepository"),
+    ISubscriptionRepository: Symbol.for("ISubscriptionRepository")
 };
 exports.TYPES = TYPES;
 //# sourceMappingURL=types.js.map

@@ -15,6 +15,10 @@ const TYPES = {
 
   IGroupController: Symbol.for("IGroupController"),
   IGroupService: Symbol.for("IGroupService"),
+
+  INotificationRepository: Symbol.for("INotificationRepository"),
+
+  ISubscriptionRepository: Symbol.for("ISubscriptionRepository")
 };
 
 export { TYPES };

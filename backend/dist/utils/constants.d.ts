@@ -53,4 +53,9 @@ export declare enum FILE_TYPES {
     IMAGE = "image",
     FILE = "file"
 }
+export declare enum NOTIFICATION_TYPE {
+    MESSAGE = "MESSAGE",
+    GROUP = "GROUP",
+    SYSTEM = "SYSTEM"
+}
 //# sourceMappingURL=constants.d.ts.map

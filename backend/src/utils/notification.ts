@@ -1,7 +1,15 @@
-import webpush from "web-push";
+import webpush, { PushSubscription } from "web-push";
 import { Request, Response } from "express";
 import { STATUS_CODES } from "./constants";
 import { sendSuccess } from "./response.helper";
+import { container } from "../config/inversify";
+import { TYPES } from "../config/types";
+import { ISubscriptionRepository } from "../repositories/interfaces/ISubscriptionRepository";
+
+// DI
+const subscriptionRepo = container.get<ISubscriptionRepository>(
+  TYPES.ISubscriptionRepository
+);
 
 // Set VAPID keys
 webpush.setVapidDetails(
@@ -10,17 +18,30 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!
 );
 
-let subscriptions: any[] = []; // Ideally store in DB
+// ---------------- SAVE SUBSCRIPTION ----------------
+export const saveSubscription = async (req: Request, res: Response) => {
+  const userId = req.query.userId as string;
+  const subscription = req.body as PushSubscription;
 
-export const saveSubscription = (req: Request, res: Response) => {
-  const subscription = req.body;
-  subscriptions.push(subscription);
-  res.status(STATUS_CODES.OK).json(sendSuccess("Subscription saved successfully"));
+  await subscriptionRepo.save(userId, subscription);
+
+  res
+    .status(STATUS_CODES.OK)
+    .json(sendSuccess("Subscription saved successfully"));
 };
 
-// Function to send push notification
-export const sendPushNotification = (payload: any) => {
-  subscriptions.forEach((sub) => {
-    webpush.sendNotification(sub, JSON.stringify(payload)).catch(console.error);
-  });
+// ---------------- SEND PUSH TO USER ----------------
+export const sendPushToUser = async (
+  userId: string,
+  payload: Record<string, any>
+) => {
+  const sub = await subscriptionRepo.getByUser(userId);
+
+  if (!sub) return;
+
+  try {
+    await webpush.sendNotification(sub.subscription, JSON.stringify(payload));
+  } catch (error) {
+    console.error("Push notification error:", error);
+  }
 };

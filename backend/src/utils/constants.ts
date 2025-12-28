@@ -58,3 +58,9 @@ export enum FILE_TYPES {
   IMAGE = "image",
   FILE = "file",
 }
+
+export enum NOTIFICATION_TYPE {
+  MESSAGE = "MESSAGE",
+  GROUP = "GROUP",
+  SYSTEM = "SYSTEM",
+}

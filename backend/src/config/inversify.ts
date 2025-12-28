@@ -24,6 +24,10 @@ import { IGroupController } from "../controllers/interfaces/IGroupController";
 import { GroupController } from "../controllers/group.controller";
 import { IGroupService } from "../services/interfaces/IGroupService";
 import { GroupService } from "../services/group.service";
+import { INotificationRepository } from "../repositories/interfaces/INotificationRepository";
+import { NotificationRepository } from "../repositories/notification.repository";
+import { ISubscriptionRepository } from "../repositories/interfaces/ISubscriptionRepository";
+import { SubscriptionRepository } from "../repositories/subscription.repository";
 
 const container = new Container();
 
@@ -43,5 +47,9 @@ container.bind<IMessageRepository>(TYPES.IMessageRepository).to(MessageRepositor
 
 container.bind<IGroupController>(TYPES.IGroupController).to(GroupController);
 container.bind<IGroupService>(TYPES.IGroupService).to(GroupService);
+
+container.bind<INotificationRepository>(TYPES.INotificationRepository).to(NotificationRepository)
+
+container.bind<ISubscriptionRepository>(TYPES.ISubscriptionRepository).to(SubscriptionRepository)
 
 export { container };

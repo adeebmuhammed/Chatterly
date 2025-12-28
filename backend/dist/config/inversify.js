@@ -15,6 +15,8 @@ const message_service_1 = require("../services/message.service");
 const message_controller_1 = require("../controllers/message.controller");
 const group_controller_1 = require("../controllers/group.controller");
 const group_service_1 = require("../services/group.service");
+const notification_repository_1 = require("../repositories/notification.repository");
+const subscription_repository_1 = require("../repositories/subscription.repository");
 const container = new inversify_1.Container();
 exports.container = container;
 container.bind(types_1.TYPES.IUserController).to(user_controller_1.UserController);
@@ -29,4 +31,6 @@ container.bind(types_1.TYPES.IMessageController).to(message_controller_1.Message
 container.bind(types_1.TYPES.IMessageRepository).to(message_repository_1.MessageRepository);
 container.bind(types_1.TYPES.IGroupController).to(group_controller_1.GroupController);
 container.bind(types_1.TYPES.IGroupService).to(group_service_1.GroupService);
+container.bind(types_1.TYPES.INotificationRepository).to(notification_repository_1.NotificationRepository);
+container.bind(types_1.TYPES.ISubscriptionRepository).to(subscription_repository_1.SubscriptionRepository);
 //# sourceMappingURL=inversify.js.map

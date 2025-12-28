@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FILE_TYPES = exports.USER_ACTIVE_STATUS = exports.REGEX = exports.MESSAGES = exports.STATUS_CODES = void 0;
+exports.NOTIFICATION_TYPE = exports.FILE_TYPES = exports.USER_ACTIVE_STATUS = exports.REGEX = exports.MESSAGES = exports.STATUS_CODES = void 0;
 exports.STATUS_CODES = {
     OK: 200,
     CREATED: 201,
@@ -58,4 +58,10 @@ var FILE_TYPES;
     FILE_TYPES["IMAGE"] = "image";
     FILE_TYPES["FILE"] = "file";
 })(FILE_TYPES || (exports.FILE_TYPES = FILE_TYPES = {}));
+var NOTIFICATION_TYPE;
+(function (NOTIFICATION_TYPE) {
+    NOTIFICATION_TYPE["MESSAGE"] = "MESSAGE";
+    NOTIFICATION_TYPE["GROUP"] = "GROUP";
+    NOTIFICATION_TYPE["SYSTEM"] = "SYSTEM";
+})(NOTIFICATION_TYPE || (exports.NOTIFICATION_TYPE = NOTIFICATION_TYPE = {}));
 //# sourceMappingURL=constants.js.map
