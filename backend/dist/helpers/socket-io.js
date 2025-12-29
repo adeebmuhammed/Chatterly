@@ -6,6 +6,7 @@ const inversify_1 = require("../config/inversify");
 const types_1 = require("../config/types");
 const notification_1 = require("../utils/notification");
 const _userRepo = inversify_1.container.get(types_1.TYPES.IUserRepository);
+const notificationRepo = inversify_1.container.get(types_1.TYPES.INotificationRepository);
 const socketHandler = (io) => {
     io.on("connection", (socket) => {
         console.log("User connected:", socket.id);
@@ -33,23 +34,38 @@ const socketHandler = (io) => {
             const messageToSend = {
                 chatId: data.chatId,
                 sender: { _id: data.senderId },
-                message: data.message,
+                message: data.message || "",
+                messageType: data.messageType || constants_1.FILE_TYPES.TEXT,
+                fileUrl: data.mediaUrl || null,
                 createdAt: new Date(),
             };
             io.to(data.chatId).emit("receiveMessage", messageToSend);
+            const previewText = data.messageType === constants_1.FILE_TYPES.IMAGE
+                ? "Image"
+                : data.messageType === constants_1.FILE_TYPES.FILE
+                    ? "File"
+                    : data.message || "New message";
             // GROUP CHAT
             if (Array.isArray(data.receiverIds)) {
                 for (const userId of data.receiverIds) {
                     if (userId === data.senderId)
                         continue;
-                    // 🔔 socket notification
+                    // 💾 SAVE notification
+                    await notificationRepo.createNotification({
+                        userId,
+                        title: "New Message",
+                        body: data.message,
+                        chatId: data.chatId,
+                        senderId: data.senderId,
+                    });
+                    // 🔔 socket
                     io.to(userId).emit("newMessageNotification", {
                         chatId: data.chatId,
                         message: data.message,
                         senderId: data.senderId,
                         createdAt: new Date(),
                     });
-                    // 📱 push notification (DB-backed)
+                    // 📱 push
                     await (0, notification_1.sendPushToUser)(userId, {
                         title: "New Message",
                         body: data.message,
@@ -61,6 +77,13 @@ const socketHandler = (io) => {
             }
             // 1-to-1 CHAT
             if (data.receiverId) {
+                await notificationRepo.createNotification({
+                    userId: data.receiverId,
+                    title: "New Message",
+                    body: previewText,
+                    chatId: data.chatId,
+                    senderId: data.senderId,
+                });
                 io.to(data.receiverId).emit("newMessageNotification", {
                     chatId: data.chatId,
                     message: data.message,

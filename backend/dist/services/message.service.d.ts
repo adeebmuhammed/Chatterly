@@ -3,11 +3,12 @@ import { IMessage } from "../models/message.model";
 import { IMessageService } from "./interfaces/IMessageService";
 import { IChatRepository } from "../repositories/interfaces/IChatRepository";
 import { MessageResponseDto } from "../dto/base.dto";
+import { FILE_TYPES } from "../utils/constants";
 export declare class MessageService implements IMessageService {
     private _messageRepo;
     private _chatRepo;
     constructor(_messageRepo: IMessageRepository, _chatRepo: IChatRepository);
-    sendMessage: (chatId: string, senderId: string, message: string) => Promise<{
+    sendMessage: (chatId: string, senderId: string, message?: string, mediaUrl?: string, messageType?: FILE_TYPES) => Promise<{
         sendMessageResponse: IMessage;
     }>;
     getMessages: (chatId: string) => Promise<{

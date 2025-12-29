@@ -5,6 +5,8 @@ const inversify_1 = require("../config/inversify");
 const types_1 = require("../config/types");
 const notification_1 = require("../utils/notification");
 const auth_middleware_1 = require("../middlewares/auth.middleware");
+const refresh_token_controller_1 = require("../controllers/refresh.token.controller");
+const s3_operations_1 = require("../utils/s3.operations");
 const userController = inversify_1.container.get(types_1.TYPES.IUserController);
 const chatController = inversify_1.container.get(types_1.TYPES.IChatController);
 const messageController = inversify_1.container.get(types_1.TYPES.IMessageController);
@@ -17,6 +19,7 @@ routes
     .post("/verify-otp", userController.verifyOTP)
     .post("/resend-otp", userController.resendOTP)
     .post("/logout", userController.logout);
+routes.post("/refresh-token", refresh_token_controller_1.refreshTokenController.refreshTokenController);
 routes.get("/search-users", userAuth, userController.searchUsers);
 routes
     .get("/chat/:userId", userAuth, chatController.getUserChats)
@@ -30,5 +33,6 @@ routes.post("/group/create", userAuth, groupController.createGroup.bind(groupCon
 routes.patch("/group/join", userAuth, groupController.joinGroup.bind(groupController));
 routes.patch("/group/leave", userAuth, groupController.leaveGroup.bind(groupController));
 routes.post("/notifications/subscribe", notification_1.saveSubscription);
+routes.get("/generate-upload-url", s3_operations_1.generateUrl);
 exports.default = routes;
 //# sourceMappingURL=routes.js.map

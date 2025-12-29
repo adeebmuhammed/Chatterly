@@ -20,17 +20,18 @@ const constants_1 = require("../utils/constants");
 let NotificationRepository = class NotificationRepository extends base_repository_1.BaseRepository {
     constructor() {
         super(notification_model_1.default);
-        this.createNotification = async ({ userId, title, body, chatId, senderId, type = constants_1.NOTIFICATION_TYPE.MESSAGE, }) => {
-            return notification_model_1.default.create({
-                user: userId,
-                title,
-                body,
-                chatId,
-                sender: senderId,
-                type,
-            });
-        };
     }
+    async createNotification({ userId, title, body, chatId, senderId, type = constants_1.NOTIFICATION_TYPE.MESSAGE, }) {
+        return notification_model_1.default.create({
+            user: userId,
+            title,
+            body,
+            chatId,
+            sender: senderId,
+            type,
+        });
+    }
+    ;
 };
 exports.NotificationRepository = NotificationRepository;
 exports.NotificationRepository = NotificationRepository = __decorate([

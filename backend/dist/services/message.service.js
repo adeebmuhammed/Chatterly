@@ -19,19 +19,25 @@ exports.MessageService = void 0;
 const inversify_1 = require("inversify");
 const types_1 = require("../config/types");
 const mongoose_1 = __importDefault(require("mongoose"));
+const constants_1 = require("../utils/constants");
 let MessageService = class MessageService {
     constructor(_messageRepo, _chatRepo) {
         this._messageRepo = _messageRepo;
         this._chatRepo = _chatRepo;
-        this.sendMessage = async (chatId, senderId, message) => {
+        this.sendMessage = async (chatId, senderId, message, mediaUrl, messageType = constants_1.FILE_TYPES.TEXT) => {
             const chat = await this._chatRepo.findById(chatId);
-            if (!chat) {
+            if (!chat)
                 throw new Error("Chat not found");
+            if (messageType !== constants_1.FILE_TYPES.TEXT && !mediaUrl) {
+                throw new Error("Media URL required for non-text messages");
             }
+            console.log(mediaUrl);
             const sendMessageResponse = await this._messageRepo.create({
                 chatId: new mongoose_1.default.Types.ObjectId(chatId),
                 sender: new mongoose_1.default.Types.ObjectId(senderId),
-                message,
+                message: messageType === constants_1.FILE_TYPES.TEXT ? message : "",
+                messageType,
+                fileUrl: mediaUrl || undefined,
             });
             return { sendMessageResponse };
         };

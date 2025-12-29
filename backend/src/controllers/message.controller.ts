@@ -34,12 +34,14 @@ export class MessageController implements IMessageController {
 
   sendMessage = async (req: Request, res: Response): Promise<void> => {
     try {
-      const { chatId, senderId, message } = req.body;
+      const { chatId, senderId, message, mediaUrl, messageType } = req.body;
 
       const { sendMessageResponse } = await this._messageService.sendMessage(
         chatId,
         senderId,
-        message
+        message,
+        mediaUrl,
+        messageType
       );
 
       res
