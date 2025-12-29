@@ -9,3 +9,8 @@ export enum UserStatus {
     ONLINE = 'online',
     OFFLINE = 'offline'
 }
+
+export interface GeneratedSignedUrl {
+  uploadUrl: string;
+  fileUrl: string;
+}

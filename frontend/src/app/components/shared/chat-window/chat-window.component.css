@@ -208,3 +208,19 @@
 .delete-btn:hover {
   color: red;
 }
+.chat-image {
+  max-width: 220px;
+  max-height: 220px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.file-link {
+  color: #0a84ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.file-link:hover {
+  text-decoration: underline;
+}

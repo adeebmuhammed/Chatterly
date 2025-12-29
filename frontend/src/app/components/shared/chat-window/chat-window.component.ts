@@ -20,6 +20,7 @@ export class ChatWindowComponent {
   @Output() typing = new EventEmitter<void>();
   @Output() stopTyping = new EventEmitter<void>();
   @Output() deleteMessage = new EventEmitter<string>();
+  @Output() sendFile = new EventEmitter<File>();
 
   messageText = '';
   menuOpen = false;
@@ -70,5 +71,29 @@ export class ChatWindowComponent {
 
   onDeleteMessage(messageId: string) {
     this.deleteMessage.emit(messageId);
+  }
+
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    // Optional: file size check (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size should be less than 10MB');
+      return;
+    }
+
+    this.sendFile.emit(file);
+
+    // reset input so same file can be selected again
+    input.value = '';
+  }
+
+  openImage(url?: string) {
+    if (!url) return;
+    window.open(url, '_blank');
   }
 }

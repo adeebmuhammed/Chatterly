@@ -16,6 +16,7 @@ import { GroupService } from '../../../services/group/group.service';
 import { CreateGroupComponent } from '../../../components/shared/create-group/create-group.component';
 import Swal from 'sweetalert2';
 import { take } from 'rxjs';
+import { S3OperationsService } from '../../../services/s3-operations/s3-operations.service';
 
 @Component({
   selector: 'app-user-home',
@@ -43,7 +44,7 @@ export class UserHomeComponent implements OnInit {
   private chatService = inject(ChatService);
   private socketService = inject(SocketService);
   private authService = inject(AuthService);
-  private notificationService = inject(NotificationService);
+  private s3Service = inject(S3OperationsService);
   private groupService = inject(GroupService);
 
   ngOnInit() {
@@ -363,5 +364,33 @@ export class UserHomeComponent implements OnInit {
           );
         },
       });
+  }
+
+  onSendFile(file: File) {
+    if (!this.activeChat) return;
+
+    this.s3Service.fetchSignedUrl(file).subscribe({
+      next: ({ uploadUrl, fileUrl }) => {
+        this.s3Service.uploadFile(uploadUrl, file).subscribe({
+          next: () => {
+            const payload = {
+              chatId: this.activeChat!._id,
+              senderId: this.loggedInUserId,
+              receiverId: this.getOtherUserId(this.activeChat!),
+              messageType: file.type.startsWith('image') ? 'image' : 'video',
+              mediaUrl: fileUrl,
+            };
+
+            // Save to DB
+            this.chatService.sendMessage(payload).subscribe();
+
+            // Realtime
+            this.socketService.sendMessage(payload);
+          },
+          error: (err) => console.error('Upload failed', err),
+        });
+      },
+      error: (err) => console.error('Signed URL failed', err),
+    });
   }
 }

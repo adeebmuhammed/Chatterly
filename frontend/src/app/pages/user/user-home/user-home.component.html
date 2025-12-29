@@ -52,6 +52,7 @@
         (leaveGroup)="onLeaveGroup(activeChat!._id)"
         (typing)="onTyping()"
         (stopTyping)="stopTyping()"
+        (sendFile)="onSendFile($event)"
       ></app-chat-window>
     </ng-container>
 
