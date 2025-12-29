@@ -36,8 +36,8 @@ let MessageController = class MessageController {
         };
         this.sendMessage = async (req, res) => {
             try {
-                const { chatId, senderId, message } = req.body;
-                const { sendMessageResponse } = await this._messageService.sendMessage(chatId, senderId, message);
+                const { chatId, senderId, message, mediaUrl, messageType } = req.body;
+                const { sendMessageResponse } = await this._messageService.sendMessage(chatId, senderId, message, mediaUrl, messageType);
                 res
                     .status(constants_1.STATUS_CODES.OK)
                     .json((0, response_helper_1.sendSuccess)("Message sent successfully", sendMessageResponse));

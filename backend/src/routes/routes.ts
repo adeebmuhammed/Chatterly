@@ -8,6 +8,7 @@ import { saveSubscription } from "../utils/notification";
 import { IGroupController } from "../controllers/interfaces/IGroupController";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { refreshTokenController } from "../controllers/refresh.token.controller";
+import { generateUrl } from "../utils/s3.operations";
 
 const userController = container.get<IUserController>(TYPES.IUserController);
 const chatController = container.get<IChatController>(TYPES.IChatController);
@@ -57,5 +58,7 @@ routes.patch(
 );
 
 routes.post("/notifications/subscribe", saveSubscription);
+
+routes.get("/generate-upload-url", generateUrl);
 
 export default routes;

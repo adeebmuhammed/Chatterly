@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { USER_ACTIVE_STATUS } from "../utils/constants";
+import { FILE_TYPES, USER_ACTIVE_STATUS } from "../utils/constants";
 import { container } from "../config/inversify";
 import { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { TYPES } from "../config/types";
@@ -44,11 +44,20 @@ export const socketHandler = (io: Server) => {
       const messageToSend = {
         chatId: data.chatId,
         sender: { _id: data.senderId },
-        message: data.message,
+        message: data.message || "",
+        messageType: data.messageType || FILE_TYPES.TEXT,
+        fileUrl: data.mediaUrl || null,
         createdAt: new Date(),
       };
 
       io.to(data.chatId).emit("receiveMessage", messageToSend);
+
+      const previewText =
+        data.messageType === FILE_TYPES.IMAGE
+          ? "Image"
+          : data.messageType === FILE_TYPES.FILE
+          ? "File"
+          : data.message || "New message";
 
       // GROUP CHAT
       if (Array.isArray(data.receiverIds)) {
@@ -89,7 +98,7 @@ export const socketHandler = (io: Server) => {
         await notificationRepo.createNotification({
           userId: data.receiverId,
           title: "New Message",
-          body: data.message,
+          body: previewText,
           chatId: data.chatId,
           senderId: data.senderId,
         });

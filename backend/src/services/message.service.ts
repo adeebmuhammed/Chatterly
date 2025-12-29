@@ -7,6 +7,7 @@ import { IMessageService } from "./interfaces/IMessageService";
 import { IChat } from "../models/chat.model";
 import { IChatRepository } from "../repositories/interfaces/IChatRepository";
 import { MessageResponseDto } from "../dto/base.dto";
+import { FILE_TYPES } from "../utils/constants";
 
 @injectable()
 export class MessageService implements IMessageService {
@@ -18,17 +19,26 @@ export class MessageService implements IMessageService {
   sendMessage = async (
     chatId: string,
     senderId: string,
-    message: string
+    message?: string,
+    mediaUrl?: string,
+    messageType: FILE_TYPES = FILE_TYPES.TEXT
   ): Promise<{ sendMessageResponse: IMessage }> => {
     const chat = await this._chatRepo.findById(chatId);
-    if (!chat) {
-      throw new Error("Chat not found");
+    if (!chat) throw new Error("Chat not found");
+
+    if (messageType !== FILE_TYPES.TEXT && !mediaUrl) {
+      throw new Error("Media URL required for non-text messages");
     }
+
+    console.log(mediaUrl);
+    
 
     const sendMessageResponse = await this._messageRepo.create({
       chatId: new mongoose.Types.ObjectId(chatId),
       sender: new mongoose.Types.ObjectId(senderId),
-      message,
+      message: messageType === FILE_TYPES.TEXT ? message : "",
+      messageType,
+      fileUrl: mediaUrl || undefined,
     });
 
     return { sendMessageResponse };
