@@ -23,6 +23,7 @@ export class UserController implements IUserController {
         secure: true, // REQUIRED
         sameSite: "none", // REQUIRED
         path: "/",
+        maxAge: 1000 * 60 * 60, // 1 hour
       });
 
       res.cookie("refresh-token", refreshToken, {

@@ -7,6 +7,7 @@ import { IMessageController } from "../controllers/interfaces/IMessageController
 import { saveSubscription } from "../utils/notification";
 import { IGroupController } from "../controllers/interfaces/IGroupController";
 import { authMiddleware } from "../middlewares/auth.middleware";
+import { refreshTokenController } from "../controllers/refresh.token.controller";
 
 const userController = container.get<IUserController>(TYPES.IUserController);
 const chatController = container.get<IChatController>(TYPES.IChatController);
@@ -24,6 +25,8 @@ routes
   .post("/verify-otp", userController.verifyOTP)
   .post("/resend-otp", userController.resendOTP)
   .post("/logout", userController.logout);
+
+routes.post("/refresh-token", refreshTokenController.refreshTokenController)
 
 routes.get("/search-users", userAuth, userController.searchUsers);
 
