@@ -1,26 +1,52 @@
 <div class="modal-backdrop" *ngIf="visible">
   <div class="modal-content">
 
-    <h2>Create Group</h2>
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Create Group</h2>
+      <button class="close-btn" (click)="closeModal.emit()">✕</button>
+    </div>
 
     <!-- Group Name -->
-    <input type="text" [(ngModel)]="groupName" placeholder="Group Name" />
+    <label class="label">Group Name</label>
+    <input
+      type="text"
+      [(ngModel)]="groupName"
+      placeholder="Enter group name"
+      class="group-input"
+    />
 
-    <h4>Select users</h4>
+    <!-- Selected Count -->
+    <div class="selected-count">
+      Selected {{ selectedUsers.length }} users
+    </div>
+
+    <!-- User List -->
     <div class="user-list">
-      <div 
+      <div
         *ngFor="let user of allUsers"
         class="user-item"
         [class.selected]="selectedUsers.includes(user.id)"
         (click)="toggleUser(user.id)"
       >
-        {{ user.name }}
+        <div class="avatar">{{ user.name[0] }}</div>
+        <span class="name">{{ user.name }}</span>
+
+        <span class="check" *ngIf="selectedUsers.includes(user.id)">✓</span>
       </div>
     </div>
 
+    <!-- Actions -->
     <div class="modal-actions">
-      <button (click)="closeModal.emit()">Cancel</button>
-      <button class="create-btn" (click)="onCreate()">Create</button>
+      <button class="cancel-btn" (click)="closeModal.emit()">Cancel</button>
+
+      <button
+        class="create-btn"
+        [disabled]="!groupName || selectedUsers.length < 2"
+        (click)="onCreate()"
+      >
+        Create Group
+      </button>
     </div>
 
   </div>

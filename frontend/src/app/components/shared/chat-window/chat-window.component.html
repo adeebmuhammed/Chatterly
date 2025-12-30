@@ -49,7 +49,7 @@
   </div>
 
   <!-- Messages -->
-  <div class="messages" id="messageArea">
+  <div class="messages" id="messageArea" #messageArea (scroll)="onScroll()">
     <div
       class="message"
       *ngFor="let msg of messages"
