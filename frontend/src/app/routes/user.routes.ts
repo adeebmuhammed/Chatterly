@@ -9,6 +9,11 @@ import { userAlreadyLoggedInGuard } from "../guards/user-already-logged-in/user-
 
 export const USER_ROUTES: Routes = [
   {
+    path: '',
+    redirectTo: USER_ROUTES_PATHS.LOGIN,
+    pathMatch: 'full',
+  },
+  {
     path: USER_ROUTES_PATHS.HOME,
     component: UserHomeComponent,
     canActivate: [userAuthGuard],
