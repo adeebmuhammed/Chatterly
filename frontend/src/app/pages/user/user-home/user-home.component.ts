@@ -17,6 +17,7 @@ import { CreateGroupComponent } from '../../../components/shared/create-group/cr
 import Swal from 'sweetalert2';
 import { take } from 'rxjs';
 import { S3OperationsService } from '../../../services/s3-operations/s3-operations.service';
+import { FILE_TYPES } from '../../../constants/constants';
 
 @Component({
   selector: 'app-user-home',
@@ -95,6 +96,8 @@ export class UserHomeComponent implements OnInit {
       if (msg.chatId === this.activeChat?._id) {
         this.messages.push(msg);
       }
+
+      this.updateChatPreview(msg.chatId, msg);
     });
 
     this.socketService.onNewMessageNotification((data: any) => {
@@ -179,6 +182,8 @@ export class UserHomeComponent implements OnInit {
 
     this.chatService.sendMessage(payload).subscribe();
     this.socketService.sendMessage(payload);
+
+    this.updateChatPreview(payload.chatId, payload);
   }
 
   results: UserSearchResultResponse[] | IChat[] = [];
@@ -200,6 +205,17 @@ export class UserHomeComponent implements OnInit {
           console.log(err);
         },
       });
+    }
+  }
+
+  private getLastMessagePreview(msg: any): string {
+    switch (msg.messageType) {
+      case FILE_TYPES.IMAGE:
+        return '📷 Photo';
+      case FILE_TYPES.FILE:
+        return '📎 File';
+      default:
+        return msg.message || 'Message';
     }
   }
 
@@ -260,12 +276,31 @@ export class UserHomeComponent implements OnInit {
     this.groupService.joinGroup(this.loggedInUserId, group._id).subscribe({
       next: (res: ApiResponse<IChat>) => {
         const chat = res.data;
-        if (chat) {
-          this.openChat(chat);
+        if (!chat) return;
+
+        // ✅ ADD TO CHAT LIST IF NOT EXISTS
+        const exists = this.chats.some((c) => c._id === chat._id);
+        if (!exists) {
+          this.chats.unshift(chat);
         }
+
+        // ✅ OPEN CHAT
+        this.openChat(chat);
       },
       error: (err) => console.error('Join group failed:', err),
     });
+  }
+
+  private updateChatPreview(chatId: string, msg: any) {
+    const chat = this.chats.find((c) => c._id === chatId);
+    if (!chat) return;
+
+    chat.lastMessage = this.getLastMessagePreview(msg);
+    chat.lastMessageSender = msg.senderId;
+    chat.updatedAt = new Date();
+
+    // Move chat to top (WhatsApp behavior)
+    this.chats = [chat, ...this.chats.filter((c) => c._id !== chatId)];
   }
 
   getOtherUserId(chat: IChat) {
@@ -278,7 +313,7 @@ export class UserHomeComponent implements OnInit {
     if (!chat) return;
 
     chat.hasUnread = true;
-    chat.lastMessage = data.message;
+    chat.lastMessage = this.getLastMessagePreview(data);
     chat.lastMessageSender = data.senderId;
     chat.updatedAt = new Date();
 
@@ -386,6 +421,8 @@ export class UserHomeComponent implements OnInit {
 
             // Realtime
             this.socketService.sendMessage(payload);
+
+            this.updateChatPreview(payload.chatId, payload);
           },
           error: (err) => console.error('Upload failed', err),
         });

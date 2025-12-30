@@ -49,7 +49,7 @@
         [typingText]="typingText"
         (sendMessage)="onSendMessage($event)"
         (deleteMessage)="onDeleteMessage($event)"
-        (leaveGroup)="onLeaveGroup(activeChat!._id)"
+        (leaveGroupEmitter)="onLeaveGroup(activeChat!._id)"
         (typing)="onTyping()"
         (stopTyping)="stopTyping()"
         (sendFile)="onSendFile($event)"

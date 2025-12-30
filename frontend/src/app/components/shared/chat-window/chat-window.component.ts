@@ -1,5 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  AfterViewChecked,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IMessage } from '../../../interfaces/message.interface';
 import { IChat, Participant } from '../../../interfaces/chat.interface';
@@ -10,7 +19,7 @@ import { IChat, Participant } from '../../../interfaces/chat.interface';
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.css',
 })
-export class ChatWindowComponent {
+export class ChatWindowComponent implements AfterViewChecked,OnChanges {
   @Input() messages: IMessage[] = [];
   @Input() activeChat: IChat | null = null;
   @Input() typingText = ''; // 👈 NEW
@@ -22,8 +31,11 @@ export class ChatWindowComponent {
   @Output() deleteMessage = new EventEmitter<string>();
   @Output() sendFile = new EventEmitter<File>();
 
+  @ViewChild('messageArea') private messageArea!: ElementRef;
+
   messageText = '';
   menuOpen = false;
+  private shouldScroll = true;
 
   protected loggedInUserId = localStorage.getItem('userId');
 
@@ -95,5 +107,31 @@ export class ChatWindowComponent {
   openImage(url?: string) {
     if (!url) return;
     window.open(url, '_blank');
+  }
+
+  ngAfterViewChecked() {
+    if (this.shouldScroll) {
+      this.scrollToBottom();
+    }
+  }
+
+  ngOnChanges() {
+    this.shouldScroll = true;
+    setTimeout(() => this.scrollToBottom(), 0);
+  }
+
+  private scrollToBottom() {
+    try {
+      const el = this.messageArea.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    } catch {}
+  }
+
+  onScroll() {
+    const el = this.messageArea.nativeElement;
+
+    const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 50;
+
+    this.shouldScroll = atBottom;
   }
 }
