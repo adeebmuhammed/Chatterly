@@ -1,12 +1,22 @@
 import { Injectable } from '@angular/core';
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environment/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SocketService {
-  private socket = io(`${environment.baseUrl}`);
+  private socket!: Socket;
+
+  connect() {
+    if (!this.socket) {
+      this.socket = io(`${environment.baseUrl}`, {
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
+    }
+  }
 
   joinRoom(chatId: string) {
     this.socket.emit('joinRoom', chatId);
@@ -21,7 +31,13 @@ export class SocketService {
   }
 
   registerUser(userId: string) {
-    this.socket.emit('registerUser', userId);
+    if (!this.socket || !this.socket.connected) {
+      this.socket.on('connect', () => {
+        this.socket.emit('registerUser', userId);
+      });
+    } else {
+      this.socket.emit('registerUser', userId);
+    }
   }
 
   onNewChat(callback: any) {
