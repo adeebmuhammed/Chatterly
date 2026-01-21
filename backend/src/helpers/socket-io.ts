@@ -5,11 +5,13 @@ import { IUserRepository } from "../repositories/interfaces/IUserRepository";
 import { TYPES } from "../config/types";
 import { sendPushToUser } from "../utils/notification";
 import { INotificationRepository } from "../repositories/interfaces/INotificationRepository";
+import { IMessageRepository } from "../repositories/interfaces/IMessageRepository";
 
 const _userRepo = container.get<IUserRepository>(TYPES.IUserRepository);
 const notificationRepo = container.get<INotificationRepository>(
   TYPES.INotificationRepository
 );
+const _messageRepo = container.get<IMessageRepository>(TYPES.IMessageRepository);
 
 export const socketHandler = (io: Server) => {
   io.on("connection", (socket: Socket) => {
@@ -162,9 +164,10 @@ export const socketHandler = (io: Server) => {
       });
     });
 
-    socket.on("deleteMessage", (data) => {
+    socket.on("deleteMessage", async (data) => {
       const { chatId, messageId } = data;
 
+      await _messageRepo.deleteMessageById(messageId);
       // Broadcast to everyone in the chat room
       io.to(chatId).emit("messageDeleted", {
         chatId,

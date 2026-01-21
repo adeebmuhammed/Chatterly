@@ -7,6 +7,7 @@ const types_1 = require("../config/types");
 const notification_1 = require("../utils/notification");
 const _userRepo = inversify_1.container.get(types_1.TYPES.IUserRepository);
 const notificationRepo = inversify_1.container.get(types_1.TYPES.INotificationRepository);
+const _messageRepo = inversify_1.container.get(types_1.TYPES.IMessageRepository);
 const socketHandler = (io) => {
     io.on("connection", (socket) => {
         console.log("User connected:", socket.id);
@@ -133,8 +134,9 @@ const socketHandler = (io) => {
                 isTyping: false,
             });
         });
-        socket.on("deleteMessage", (data) => {
+        socket.on("deleteMessage", async (data) => {
             const { chatId, messageId } = data;
+            await _messageRepo.deleteMessageById(messageId);
             // Broadcast to everyone in the chat room
             io.to(chatId).emit("messageDeleted", {
                 chatId,

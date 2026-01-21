@@ -52,6 +52,7 @@ export class UserHomeComponent implements OnInit {
     this.authService.userId$.subscribe((userId) => {
       if (userId) {
         this.loggedInUserId = userId;
+        this.socketService.connect();
         this.socketService.registerUser(userId); // important!
         this.loadChats();
       }
@@ -180,8 +181,11 @@ export class UserHomeComponent implements OnInit {
       message: text,
     };
 
-    this.chatService.sendMessage(payload).subscribe();
-    this.socketService.sendMessage(payload);
+    this.chatService.sendMessage(payload).subscribe({
+      next: ( )=> {
+        this.socketService.sendMessage(payload);
+      }
+    });
 
     this.updateChatPreview(payload.chatId, payload);
   }
@@ -373,32 +377,10 @@ export class UserHomeComponent implements OnInit {
   }
 
   onDeleteMessage(messageId: string) {
-    console.log('delete message 1');
-    console.log(messageId);
-
     if (!this.activeChat) {
       return;
     }
-    this.chatService
-      .deleteMessage(messageId)
-      .pipe(take(1))
-      .subscribe({
-        next: (res: ApiResponse<null>) => {
-          this.socketService.emitDeleteMessage(this.activeChat!._id, messageId);
-          Swal.fire(
-            'Message Deleted',
-            res.message || 'You deleted the message successfully',
-            'success'
-          );
-        },
-        error: (err) => {
-          Swal.fire(
-            'Error',
-            err.message || 'Failed to delete message',
-            'error'
-          );
-        },
-      });
+    this.socketService.emitDeleteMessage(this.activeChat!._id, messageId)
   }
 
   onSendFile(file: File) {
