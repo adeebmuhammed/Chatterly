@@ -10,12 +10,13 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
 import { IMessage } from '../../../interfaces/message.interface';
 import { IChat, Participant } from '../../../interfaces/chat.interface';
 
 @Component({
   selector: 'app-chat-window',
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, PickerModule],
   templateUrl: './chat-window.component.html',
   styleUrl: './chat-window.component.css',
 })
@@ -134,4 +135,15 @@ export class ChatWindowComponent implements AfterViewChecked,OnChanges {
 
     this.shouldScroll = atBottom;
   }
+
+  showEmojiPicker = false;
+
+toggleEmojiPicker() {
+  this.showEmojiPicker = !this.showEmojiPicker;
+}
+
+addEmoji(event: any) {
+  this.messageText += event.emoji.native;
+}
+
 }

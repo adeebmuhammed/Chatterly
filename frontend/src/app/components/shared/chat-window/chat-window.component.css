@@ -86,7 +86,54 @@
   padding: 14px;
   background: #ffffff;
   border-top: 1px solid #ddd;
+  position: relative;
 }
+
+.emoji-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+/* Emoji picker container */
+.emoji-picker {
+  position: absolute;
+  bottom: 60px;
+  left: 10px;
+  width: 330px;
+  height: 320px;
+
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+  overflow: hidden; /* 🔥 important */
+  z-index: 1000;
+}
+
+/* Force emoji-mart to scroll internally */
+.emoji-picker emoji-mart {
+  height: 100%;
+}
+
+/* Fix internal scroll */
+.emoji-picker ::ng-deep .emoji-mart-scroll {
+  height: 240px !important;
+  overflow-y: auto !important;
+}
+
+/* Smooth scrolling (WhatsApp feel) */
+.emoji-picker ::ng-deep .emoji-mart-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.emoji-picker ::ng-deep .emoji-mart-scroll::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
 
 .chat-input input {
   flex: 1;

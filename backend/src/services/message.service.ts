@@ -13,7 +13,7 @@ import { FILE_TYPES } from "../utils/constants";
 export class MessageService implements IMessageService {
   constructor(
     @inject(TYPES.IMessageRepository) private _messageRepo: IMessageRepository,
-    @inject(TYPES.IChatRepository) private _chatRepo: IChatRepository
+    @inject(TYPES.IChatRepository) private _chatRepo: IChatRepository,
   ) {}
 
   sendMessage = async (
@@ -21,7 +21,7 @@ export class MessageService implements IMessageService {
     senderId: string,
     message?: string,
     mediaUrl?: string,
-    messageType: FILE_TYPES = FILE_TYPES.TEXT
+    messageType: FILE_TYPES = FILE_TYPES.TEXT,
   ): Promise<{ sendMessageResponse: IMessage }> => {
     const chat = await this._chatRepo.findById(chatId);
     if (!chat) throw new Error("Chat not found");
@@ -30,8 +30,9 @@ export class MessageService implements IMessageService {
       throw new Error("Media URL required for non-text messages");
     }
 
-    console.log(mediaUrl);
-    
+    if (mediaUrl) {
+      console.log(mediaUrl);
+    }
 
     const sendMessageResponse = await this._messageRepo.create({
       chatId: new mongoose.Types.ObjectId(chatId),
@@ -45,17 +46,16 @@ export class MessageService implements IMessageService {
   };
 
   getMessages = async (
-    chatId: string
+    chatId: string,
   ): Promise<{ getMessagesResponse: IMessage[] }> => {
-    const getMessagesResponse = await this._messageRepo.getMessagesByChat(
-      chatId
-    );
+    const getMessagesResponse =
+      await this._messageRepo.getMessagesByChat(chatId);
 
     return { getMessagesResponse };
   };
 
   deleteMessage = async (
-    messageId: string
+    messageId: string,
   ): Promise<{ deleteMessageResponse: MessageResponseDto }> => {
     const message = this._messageRepo.findById(messageId);
     if (!message) {
