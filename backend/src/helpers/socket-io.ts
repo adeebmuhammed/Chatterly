@@ -175,6 +175,12 @@ export const socketHandler = (io: Server) => {
       });
     });
 
+    socket.on('leaveRoom', (chatId: string) => {
+  socket.leave(chatId);
+  console.log(`User ${socket.id} left room ${chatId}`);
+});
+
+
     // Disconnect
     socket.on("disconnect", async () => {
       const userId = socket.data.userId;

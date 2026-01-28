@@ -7,6 +7,7 @@ import { environment } from '../../../environment/environment';
 })
 export class SocketService {
   private socket!: Socket;
+  private currentRoom: string | null = null;
 
   connect() {
     if (!this.socket) {
@@ -19,7 +20,12 @@ export class SocketService {
   }
 
   joinRoom(chatId: string) {
+    if (this.currentRoom) {
+      this.socket.emit('leaveRoom', this.currentRoom);
+    }
+
     this.socket.emit('joinRoom', chatId);
+    this.currentRoom = chatId;
   }
 
   sendMessage(data: any) {
