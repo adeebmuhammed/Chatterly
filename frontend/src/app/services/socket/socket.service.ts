@@ -96,7 +96,9 @@ export class SocketService {
 
   disconnect() {
     if (this.socket && this.socket.connected) {
+      this.socket.removeAllListeners();
       this.socket.disconnect();
+      this.socket = null as any;
     }
   }
 }

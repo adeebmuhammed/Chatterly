@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { UserHeaderComponent } from '../../../components/user/user-header/user-header.component';
 import { ChatListComponent } from '../../../components/shared/chat-list/chat-list.component';
 import { ChatWindowComponent } from '../../../components/shared/chat-window/chat-window.component';
@@ -32,7 +32,7 @@ import { FILE_TYPES } from '../../../constants/constants';
   templateUrl: './user-home.component.html',
   styleUrl: './user-home.component.css',
 })
-export class UserHomeComponent implements OnInit {
+export class UserHomeComponent implements OnInit, OnDestroy {
   chats: IChatUI[] = [];
   messages: IMessage[] = [];
   activeChat: IChatUI | null = null;
@@ -49,38 +49,14 @@ export class UserHomeComponent implements OnInit {
   private groupService = inject(GroupService);
 
   ngOnInit() {
-    this.authService.userId$.subscribe((userId) => {
-      if (userId) {
-        this.loggedInUserId = userId;
-        this.socketService.connect();
-        this.socketService.registerUser(userId); // important!
-        this.loadChats();
-      }
-    });
-
-    this.socketService.onUserStatusChanged((data: any) => {
-      const { userId, status, lastSeen } = data;
-
-      this.chats.forEach((chat) => {
-        chat.participants.forEach((user) => {
-          if (user._id === userId) {
-            user.status = status;
-            user.lastSeen = lastSeen ?? null;
-          }
-        });
-      });
-    });
-
-    this.socketService.onUserTyping((data: any) => {
-      const { userId, isTyping, chatId } = data;
-
-      if (chatId !== this.activeChat?._id) return;
-
-      if (isTyping) {
-        this.typingUsers.add(userId);
-      } else {
-        this.typingUsers.delete(userId);
-      }
+    this.authService.userId$
+    .pipe(take(1))
+    .subscribe((userId) => {
+      this.loggedInUserId = userId!;
+      this.socketService.connect();
+      this.socketService.registerUser(userId!);
+      this.loadChats();
+      this.registerSocketListeners();
     });
 
     this.socketService.onMessageDeleted((data: any) => {
@@ -93,14 +69,6 @@ export class UserHomeComponent implements OnInit {
       this.chats.unshift(chat); // Add new chat live
     });
 
-    this.socketService.onMessage((msg: any) => {
-      if (msg.chatId === this.activeChat?._id) {
-        this.messages.push(msg);
-      }
-
-      this.updateChatPreview(msg.chatId, msg);
-    });
-
     this.socketService.onNewMessageNotification((data: any) => {
       // Don't show unread on sender's own device
       if (data.senderId === this.loggedInUserId) return;
@@ -109,6 +77,39 @@ export class UserHomeComponent implements OnInit {
       if (data.chatId !== this.activeChat?._id) {
         this.markChatAsUnread(data.chatId, data);
       }
+    });
+  }
+
+  private registerSocketListeners() {
+    this.socketService.onMessage((msg: any) => {
+      if (msg.chatId === this.activeChat?._id) {
+        this.messages.push(msg);
+      }
+
+      this.updateChatPreview(msg.chatId, msg);
+    });
+    this.socketService.onUserTyping((data: any) => {
+      const { userId, isTyping, chatId } = data;
+
+      if (chatId !== this.activeChat?._id) return;
+
+      if (isTyping) {
+        this.typingUsers.add(userId);
+      } else {
+        this.typingUsers.delete(userId);
+      }
+    });
+    this.socketService.onUserStatusChanged((data: any) => {
+      const { userId, status, lastSeen } = data;
+
+      this.chats.forEach((chat) => {
+        chat.participants.forEach((user) => {
+          if (user._id === userId) {
+            user.status = status;
+            user.lastSeen = lastSeen ?? null;
+          }
+        });
+      });
     });
   }
 
@@ -134,7 +135,7 @@ export class UserHomeComponent implements OnInit {
           Swal.fire(
             'Success',
             res.message || 'Group Chat Created Successfully',
-            'success'
+            'success',
           );
           if (res.data) {
             this.chats.unshift(res.data);
@@ -145,7 +146,7 @@ export class UserHomeComponent implements OnInit {
           Swal.fire(
             'Error',
             err.message || 'Group Chat Creation Failed',
-            'error'
+            'error',
           );
           console.error(err);
         },
@@ -182,9 +183,9 @@ export class UserHomeComponent implements OnInit {
     };
 
     this.chatService.sendMessage(payload).subscribe({
-      next: ( )=> {
+      next: () => {
         this.socketService.sendMessage(payload);
-      }
+      },
     });
 
     this.updateChatPreview(payload.chatId, payload);
@@ -330,7 +331,7 @@ export class UserHomeComponent implements OnInit {
         Swal.fire(
           'Left Group',
           res.message || 'You left the group successfully',
-          'success'
+          'success',
         );
 
         // remove chat from list
@@ -380,7 +381,7 @@ export class UserHomeComponent implements OnInit {
     if (!this.activeChat) {
       return;
     }
-    this.socketService.emitDeleteMessage(this.activeChat!._id, messageId)
+    this.socketService.emitDeleteMessage(this.activeChat!._id, messageId);
   }
 
   onSendFile(file: File) {
@@ -411,5 +412,9 @@ export class UserHomeComponent implements OnInit {
       },
       error: (err) => console.error('Signed URL failed', err),
     });
+  }
+
+  ngOnDestroy(): void {
+    this.socketService.disconnect();
   }
 }
