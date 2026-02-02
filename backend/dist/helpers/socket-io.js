@@ -143,6 +143,10 @@ const socketHandler = (io) => {
                 messageId,
             });
         });
+        socket.on('leaveRoom', (chatId) => {
+            socket.leave(chatId);
+            console.log(`User ${socket.id} left room ${chatId}`);
+        });
         // Disconnect
         socket.on("disconnect", async () => {
             const userId = socket.data.userId;
