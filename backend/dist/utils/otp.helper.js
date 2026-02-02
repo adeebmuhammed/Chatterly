@@ -13,7 +13,7 @@ class OTPHelper {
             console.log("EMAIL:", process.env.NODEMAILER_EMAIL);
             console.log("PASS EXISTS:", !!process.env.NODEMAILER_PASSWORD);
             const transporter = nodemailer_1.default.createTransport({
-                service: "smtp.gmail.com",
+                service: "gmail",
                 auth: {
                     user: process.env.NODEMAILER_EMAIL,
                     pass: process.env.NODEMAILER_PASSWORD,
