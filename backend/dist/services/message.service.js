@@ -31,7 +31,9 @@ let MessageService = class MessageService {
             if (messageType !== constants_1.FILE_TYPES.TEXT && !mediaUrl) {
                 throw new Error("Media URL required for non-text messages");
             }
-            console.log(mediaUrl);
+            if (mediaUrl) {
+                console.log(mediaUrl);
+            }
             const sendMessageResponse = await this._messageRepo.create({
                 chatId: new mongoose_1.default.Types.ObjectId(chatId),
                 sender: new mongoose_1.default.Types.ObjectId(senderId),
